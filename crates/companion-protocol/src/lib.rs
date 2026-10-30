@@ -167,6 +167,9 @@ pub struct Envelope {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Request {
+    MemoryScopes {
+        after: Option<String>,
+    },
     TaskScopes {
         after: Option<String>,
     },
@@ -315,6 +318,10 @@ pub enum Request {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Reply {
+    MemoryScopes {
+        scopes: Vec<MemoryScope>,
+        next_after: Option<String>,
+    },
     TaskScopes {
         scopes: Vec<TaskScopeInfo>,
         next_after: Option<String>,
@@ -488,6 +495,15 @@ pub fn decode(bytes: &[u8]) -> Result<Envelope, String> {
         return Err("invalid_envelope".into());
     }
     match &e.body {
+        Request::MemoryScopes { after: Some(after) }
+            if !(after == "global"
+                || after
+                    .strip_prefix("project:")
+                    .or_else(|| after.strip_prefix("task:"))
+                    .is_some_and(identifier)) =>
+        {
+            return Err("invalid_memory_scope_cursor".into())
+        }
         Request::TaskScopes { after: Some(after) } if !identifier(after) => {
             return Err("invalid_scope_cursor".into())
         }

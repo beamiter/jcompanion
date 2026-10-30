@@ -459,6 +459,47 @@ impl Store {
             next_cursor,
         })
     }
+    /// Explicit management discovery only: scope names, including expired entries.
+    /// Does not grant entry access or authorize model retrieval. Works while paused.
+    pub fn list_scopes(
+        &self,
+        after: Option<&str>,
+        limit: usize,
+    ) -> Result<(Vec<Scope>, Option<String>)> {
+        fn decode(key: &str) -> Result<Scope> {
+            let scope = if key == "global" {
+                Scope::Global
+            } else if let Some(id) = key.strip_prefix("project:") {
+                Scope::Project(id.into())
+            } else if let Some(id) = key.strip_prefix("task:") {
+                Scope::Task(id.into())
+            } else {
+                return Err(Error::Invalid("scope cursor"));
+            };
+            scope.key()?;
+            Ok(scope)
+        }
+        if limit == 0 || limit > 100 {
+            return Err(Error::Invalid("scope page bounds"));
+        }
+        if let Some(cursor) = after {
+            decode(cursor)?;
+        }
+        let mut stmt = self.db.prepare("SELECT DISTINCT scope FROM entries WHERE (?1 IS NULL OR scope > ?1) ORDER BY scope LIMIT ?2")?;
+        let keys = stmt
+            .query_map(params![after, (limit + 1) as i64], |r| {
+                r.get::<_, String>(0)
+            })?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        let more = keys.len() > limit;
+        let visible = &keys[..keys.len().min(limit)];
+        let scopes = visible
+            .iter()
+            .map(|k| decode(k))
+            .collect::<Result<Vec<_>>>()?;
+        let next = if more { visible.last().cloned() } else { None };
+        Ok((scopes, next))
+    }
     /// Management lookup includes expired entries so they can still be reviewed/deleted.
     pub fn get(&self, id: i64) -> Result<Option<Entry>> {
         if id <= 0 {
@@ -520,6 +561,24 @@ mod tests {
             expected_revision: None,
             expires_at: None,
         }
+    }
+    #[test]
+    fn management_scope_discovery_is_bounded_paginated_and_paused_safe() {
+        let mut s = Store::in_memory().unwrap();
+        save(&mut s, put(Scope::Project("z".into()), "z"));
+        save(&mut s, put(Scope::Project("a".into()), "a"));
+        save(&mut s, put(Scope::Global, "g"));
+        s.set_paused(true).unwrap();
+        let (first, cursor) = s.list_scopes(None, 2).unwrap();
+        assert_eq!(first, vec![Scope::Global, Scope::Project("a".into())]);
+        assert_eq!(cursor.as_deref(), Some("project:a"));
+        let (last, end) = s.list_scopes(cursor.as_deref(), 2).unwrap();
+        assert_eq!(last, vec![Scope::Project("z".into())]);
+        assert!(end.is_none());
+        assert!(s.list_scopes(None, 0).is_err());
+        assert!(s.list_scopes(None, 101).is_err());
+        assert!(s.list_scopes(Some("project:"), 2).is_err());
+        assert!(s.retrieve(&Scope::Global, "", 20, 1).is_err());
     }
     fn save(s: &mut Store, c: Change) {
         let p = s.propose(c).unwrap();

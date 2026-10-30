@@ -32,3 +32,19 @@ Task namespaces are separately persisted in `task-authority.json` (4096 tasks, a
 This does **not** orphan old memories: `TaskScopes` paginates metadata discovery; `MemoryScopeReviewRequested` / `MemoryScopeApprove` grants explicit management access to a selected archived task/project. That grant is connection/current-context bound and permits inspect/edit/delete/clear only. It never enables model retrieval or changes task ownership. Changing context/disconnecting clears it. This lets the user clean up an old task after its original GUI has gone, without automatic takeover.
 
 Persisted memory `created_at` and `expires_at` are **Unix epoch milliseconds**. Residence cooldowns, presentation animation and review deadlines use monotonic time instead. Tests cover reopen and expiry progression in epoch milliseconds.
+
+### Archived scope discovery
+`MemoryScopes { after }` lists at most 16 persisted scope names and `next_after`
+(canonical `global`, `project:<id>`, or `task:<id>` cursor). Unlike the task
+registry's `TaskScopes`, this also finds project-only memories with no registered
+task. Expired records remain discoverable for management while memory is paused.
+Discovery returns no entry content and grants no management or model access:
+foreign archived scopes still require exact current-context scope review/approval.
+Locked or unknown observed desktop state blocks discovery.
+
+Task project bindings are not silently reassigned: the registered owner can bind
+an initially unassigned task once; changing an existing nonempty project requires
+a fresh task context. Frontends may assign a named project to a taskless pane,
+or use a fresh host-qualified task on explicit project change. Context revision
+must increase, invalidating pending consent/reviews; old memories retain their
+original scope and can be managed through the archived-scope review flow.

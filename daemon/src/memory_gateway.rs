@@ -74,6 +74,13 @@ impl Gateway {
             }
         };
         match request {
+            Request::MemoryScopes { after } => {
+                let (scopes, next_after) = s.list_scopes(after.as_deref(), 16).map_err(error)?;
+                Ok(Reply::MemoryScopes {
+                    scopes: convert(&scopes)?,
+                    next_after,
+                })
+            }
             Request::MemoryScopeReviewRequested { context, scope } => {
                 validate(context)?;
                 if self.scope_reviews.len() >= 32 {
@@ -372,6 +379,80 @@ mod archived_scope_tests {
         assert!(g.retrieve(&c, &[scope], 1800000000000).is_err());
         g.invalidate(1);
         assert!(g.handle(1, Some(&c), &req, 1800000000000).is_err());
+    }
+    #[test]
+    fn pure_project_discovery_does_not_grant_content_or_model_access() {
+        let mut g = Gateway {
+            store: Some(memory::Store::in_memory().unwrap()),
+            reviews: HashMap::new(),
+            scope_reviews: HashMap::new(),
+            grants: HashMap::new(),
+        };
+        let mut owner = ctx();
+        owner.project_id = Some("archived-project".into());
+        let scope = MemoryScope::Project("archived-project".into());
+        let Reply::MemoryReview { review, .. } = g
+            .handle(
+                1,
+                Some(&owner),
+                &Request::MemoryPropose {
+                    context: owner.clone(),
+                    change: MemoryChange::Put {
+                        scope: scope.clone(),
+                        key: "preference".into(),
+                        value: "quiet".into(),
+                        source_event_id: "explicit-user".into(),
+                        expected_revision: None,
+                        expires_at: Some(1800000001000),
+                    },
+                },
+                1800000000000,
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
+        g.handle(
+            1,
+            Some(&owner),
+            &Request::MemoryApprove {
+                context: owner.clone(),
+                review_id: review.id,
+                digest: review.digest,
+            },
+            1800000000000,
+        )
+        .unwrap();
+        g.invalidate(1); // Original owner/context has gone away.
+        g.store.as_mut().unwrap().set_paused(true).unwrap();
+        let c = ctx();
+        let Reply::MemoryScopes { scopes, next_after } = g
+            .handle(
+                2,
+                Some(&c),
+                &Request::MemoryScopes { after: None },
+                1800000002000,
+            )
+            .unwrap()
+        else {
+            panic!()
+        };
+        assert_eq!(scopes, vec![scope.clone()]);
+        assert!(next_after.is_none());
+        assert!(g
+            .handle(
+                2,
+                Some(&c),
+                &Request::MemoryList {
+                    context: c.clone(),
+                    scope: scope.clone(),
+                    query: String::new(),
+                    before_id: None,
+                },
+                1800000002000
+            )
+            .is_err());
+        assert!(g.retrieve(&c, &[scope], 1800000002000).is_err());
     }
     #[test]
     fn persisted_expiry_uses_epoch_milliseconds() {

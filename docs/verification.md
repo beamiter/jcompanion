@@ -16,3 +16,7 @@ These synthetic hosts acknowledge protocol retirement; even a successful process
 Additional executed coverage: queued Hidden/lock Recall without proof bypass, scene same-token suppression, idempotent durable retirement acknowledgement after restart, 129-reply backpressure isolation, handshake controls waiting for Accepted boot, final complete frame before EOF, exact task sharing/collision persistence, archived management grants not usable as model access, and memory reopen/expiry in Unix epoch milliseconds.
 
 Packaging verification: relocated atlas plus exact Git-pinned jagent source passed **71 workspace tests** (including atlas, memory and provider fixtures). See `tests/relocated-workspace-results.txt`. This is synthetic/offline coverage, not live IPC/hardware acceptance.
+
+## Archived scope discovery follow-up
+
+The complete relocated workspace passes 73 tests and strict workspace Clippy after the paginated persisted-scope discovery addition. See `tests/scope-discovery-workspace-results.txt` and `tests/scope-discovery-clippy-results.txt`. This includes expired project-only scopes and management while paused; discovery never grants model retrieval. Native GUI, physical audio/GPU and live provider acceptance remain unverified. The CI workflow runs the self-contained local IPC fault contract on its runner; that result must be checked separately and is not native pixel proof.

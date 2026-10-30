@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  contracts-and-local-ipc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Official stable Rust toolchain
+        run: rustup toolchain install stable --profile minimal --component clippy
+      - name: Workspace unit and contract tests
+        run: cargo +stable test --workspace --locked
+      - name: Strict workspace lint
+        run: cargo +stable clippy --workspace --all-targets --locked -- -D warnings
+      - name: Build coordinator
+        run: cargo +stable build --locked -p jcompaniond
+      - name: Local IPC and process fault contract
+        # These mock hosts test protocol/process behavior, not native pixel removal.
+        run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/fault_processes.py target/debug/jcompaniond

@@ -620,6 +620,7 @@ fn run() -> io::Result<()> {
                                     | Request::MemoryScopeReviewRequested { .. }
                                     | Request::MemoryScopeApprove { .. }
                                     | Request::TaskScopes { .. }
+                                    | Request::MemoryScopes { .. }
                                     | Request::TaskSharePropose { .. }
                                     | Request::TaskShareApprove { .. }
                                     | Request::MemoryList { .. }
@@ -775,7 +776,8 @@ fn run() -> io::Result<()> {
                                 }
                                 None
                             }
-                            request @ (Request::MemoryScopeReviewRequested { .. }
+                            request @ (Request::MemoryScopes { .. }
+                            | Request::MemoryScopeReviewRequested { .. }
                             | Request::MemoryScopeApprove { .. }
                             | Request::MemoryList { .. }
                             | Request::MemoryPropose { .. }
