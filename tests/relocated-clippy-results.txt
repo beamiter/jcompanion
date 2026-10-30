@@ -1,0 +1,9 @@
+    Checking companion-protocol v0.1.0 (<workspace>/jcompanion/crates/companion-protocol)
+    Checking jagent v0.7.0 (https://github.com/beamiter/jagent.git?rev=ed03819213d8253be7687500487993233d13b1a5#ed038192)
+    Checking companion-openai v0.1.0 (<workspace>/jcompanion/crates/companion-openai)
+    Checking companion-client v0.1.0 (<workspace>/jcompanion/crates/companion-client)
+    Checking companion-memory v0.1.0 (<workspace>/jcompanion/crates/companion-memory)
+    Checking companion-core v0.1.0 (<workspace>/jcompanion/crates/companion-core)
+    Checking eva-character-atlas v0.1.0 (<workspace>/jcompanion/crates/eva-character-atlas)
+    Checking jcompaniond v0.1.0 (<workspace>/jcompanion/daemon)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.72s

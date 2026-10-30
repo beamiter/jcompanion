@@ -1,0 +1,85 @@
+   Compiling companion-client v0.1.0 (<workspace>/jcompanion/crates/companion-client)
+   Compiling jcompaniond v0.1.0 (<workspace>/jcompanion/daemon)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.30s
+     Running unittests src/lib.rs (eva-workspace/jcompanion/target/debug/deps/companion_client-fea3aca518159b22)
+
+running 4 tests
+test tests::framed_roundtrip ... ok
+test eof_tests::complete_final_frame_survives_eof ... ok
+test tests::backpressure_preserves_control ... ok
+test handshake_tests::early_controls_wait_for_accepted_boot ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (eva-workspace/jcompanion/target/debug/deps/companion_core-dd487246473c23c8)
+
+running 19 tests
+test behavior::activity_tests::movement_and_content_cues_are_bounded ... ok
+test behavior::activity_tests::recent_activity_does_not_curl_after_daemon_uptime ... ok
+test behavior::tests::hard_priority ... ok
+test behavior::activity_tests::new_task_success_restarts_brief_fact_pose ... ok
+test fault_traces::compositor_policy_cannot_accept_native_proof ... ok
+test behavior::tests::deterministic_trace ... ok
+test fault_traces::counter_and_inconsistent_journal_fail_closed ... ok
+test recall_and_retirement_tests::hidden_recall_waits_exact_proof_then_prepares ... ok
+test recall_and_retirement_tests::locked_recall_never_unhides_lock_or_overrides_proof ... ok
+test recall_and_retirement_tests::lost_retirement_ack_is_idempotent_across_restart ... ok
+test scene_tests::unproven_scene_bootstrap_never_proves_removal ... ok
+test recall_and_retirement_tests::scene_hide_recall_and_lock_keep_one_same_token ... ok
+test geometry::tests::input_protected ... ok
+test tests::hidden_revokes_not_forgets ... ok
+test tests::transfer_requires_exact_proof ... ok
+test tests::old_callbacks_rejected ... ok
+test tests::stopped_disconnected_or_restarted_owner_never_expires ... ok
+test tests::target_disconnect_does_not_grant ... ok
+test fault_traces::virtual_clock_adversarial_transitions_preserve_journal ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+     Running unittests src/lib.rs (eva-workspace/jcompanion/target/debug/deps/companion_protocol-c920496e0b41baf4)
+
+running 2 tests
+test strict_json::tests::nested_duplicates_rejected ... ok
+test tests::reject_unknown_duplicate_and_oversize ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (eva-workspace/jcompanion/target/debug/deps/jcompaniond-274050dd698c50d9)
+
+running 16 tests
+test audio_tests::generated_is_not_played ... ok
+test audio_tests::audio_counter_regression_and_interruption ... ok
+test dialogue::tests::routes_and_heard_are_not_generation ... ok
+test dialogue::tests::stale_context_not_displayed ... ok
+test providers::privacy_tests::disabled_and_cross_scope_input_never_reaches_transport ... ok
+test peer_backpressure_tests::one_hundred_twenty_nine_replies_isolate_only_slow_peer ... ok
+test storage::tests::storage_failure_and_invariant_rejection ... ok
+test task_authority::tests::collision_rejected_until_explicit_shared_review_and_persists ... ok
+test storage::tests::durable_identity_and_exclusive_profile ... ok
+test memory_gateway::tests::review_is_connection_and_context_bound ... ok
+test providers::tests::mock_only_completed_is_not_displayed_or_heard ... ok
+test providers::tests::mock_only_zero_idle_one_inflight_cancel_no_replay ... ok
+test memory_gateway::archived_scope_tests::archived_management_grant_never_becomes_model_scope ... ok
+test storage::tests::corrupt_journal_never_resets ... ok
+test memory_gateway::archived_scope_tests::persisted_expiry_uses_epoch_milliseconds ... ok
+test providers::tests::mock_only_timeout_rate_limit_budget ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+   Doc-tests companion_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

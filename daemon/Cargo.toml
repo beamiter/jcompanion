@@ -1,0 +1,16 @@
+[package]
+name = "jcompaniond"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+libc.workspace = true
+companion-protocol.workspace = true
+companion-core.workspace = true
+companion-client.workspace = true
+
+companion-memory = { path = "../crates/companion-memory" }
+companion-openai = { path = "../crates/companion-openai" }
+sha2 = "0.10"

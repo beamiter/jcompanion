@@ -1,0 +1,9 @@
+# Recovery and persisted authority
+
+`residence.json` is an atomic durable write-ahead checkpoint: persistent companion ID, profile revision, boot, bound session, epochs, mode/appearance, target, possibly visible token, revoke intent and phase. It is validated before every commit and after load, including identifier/counter/phase/token invariants. Profile flock and socket namespace flock remain held for the process lifetime. The next daemon uses a random boot read from the OS, preserves any possibly visible old token, drops speculative targets and enters RecoveryBlocked. It reconciles a returning exact old host/incarnation/surface with Revoke. No PID disappearance, SIGSTOP, heartbeat loss or lease expiry proves pixels absent.
+
+A crash after grant persistence but before actual delivery can conservatively leave an uncertain token although nothing drew. A crash after retirement persistence but before next grant preserves safety. Storage failures terminate before subsequent wire effects. If rename completed but directory sync failed, no new wire effect is sent; either durable state is conservative. Corrupt or unsupported journals fail closed rather than generating a new identity. The stored session must match on restart; second-session takeover is deliberately rejected. Do not delete a journal to bypass uncertainty while old windows/surfaces may exist.
+
+Recovery remains blocked if the host instance is gone and no trusted compositor surface-destruction proof integration exists. This is intentional and is not an implemented general recovery UI. Close/upgrade legacy independent pets before enabling shared mode; an old client that never spoke this protocol cannot be remotely disabled by it.
+
+Release defaults stay disabled via explicit launch/environment opt-in. No auto-start service or OS policy changes are installed. Compositor-only and compositor-proof requirements are persisted and never silently downgraded by omitted environment flags.

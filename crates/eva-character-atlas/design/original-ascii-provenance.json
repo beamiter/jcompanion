@@ -1,0 +1,136 @@
+{
+  "source_file": "Eva_Companion_ASCII_Organism_图文技术方案_完整版.html",
+  "source_sha256": "dd9c34df67f53d3cdd484bd217c7e68f9190df624c754c71eea8dfc1cf5c1b5a",
+  "extraction": "JSON.parse equivalent of script#characterData; no trimming, glyph replacement, or pose invention",
+  "animation_frames_in_source": false,
+  "skins": {
+    "cat": {
+      "lines": [
+        " /\\_/\\",
+        "( o.o )",
+        " > ^ <"
+      ],
+      "line_widths": [
+        6,
+        7,
+        6
+      ],
+      "height": 3,
+      "width": 7
+    },
+    "fox": {
+      "lines": [
+        " /\\   /\\",
+        "( o\\_/o )",
+        " /  v  \\",
+        " ~\\___/~"
+      ],
+      "line_widths": [
+        8,
+        9,
+        8,
+        8
+      ],
+      "height": 4,
+      "width": 9
+    },
+    "robot": {
+      "lines": [
+        "   .|.",
+        " .-===-.",
+        "[  o_o  ]",
+        " /|___|\\"
+      ],
+      "line_widths": [
+        6,
+        8,
+        9,
+        8
+      ],
+      "height": 4,
+      "width": 9
+    },
+    "ghost": {
+      "lines": [
+        " .----- .",
+        "(  o  o )",
+        "(   ~   )",
+        " \\_~_~/"
+      ],
+      "line_widths": [
+        9,
+        9,
+        9,
+        7
+      ],
+      "height": 4,
+      "width": 9
+    },
+    "cursor": {
+      "lines": [
+        "   /|",
+        "  /o|",
+        " /_^|",
+        "/___|"
+      ],
+      "line_widths": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "height": 4,
+      "width": 5
+    },
+    "beetle": {
+      "lines": [
+        " \\  |  /",
+        "  .-^-.",
+        " / o o \\",
+        "| \\___/ |",
+        " \\_/ \\_/"
+      ],
+      "line_widths": [
+        8,
+        7,
+        8,
+        9,
+        8
+      ],
+      "height": 5,
+      "width": 9
+    },
+    "night": {
+      "lines": [
+        " /\\_/\\",
+        "( =.= )",
+        " /)_(\\"
+      ],
+      "line_widths": [
+        6,
+        7,
+        6
+      ],
+      "height": 3,
+      "width": 7
+    },
+    "stardust": {
+      "lines": [
+        "    *",
+        "  .-o-.",
+        "*( o.o )*",
+        "  `-^-'",
+        "    ."
+      ],
+      "line_widths": [
+        5,
+        7,
+        9,
+        7,
+        5
+      ],
+      "height": 5,
+      "width": 9
+    }
+  }
+}

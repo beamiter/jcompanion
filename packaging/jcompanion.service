@@ -1,0 +1,11 @@
+# Reviewed opt-in template; no [Install] target and no automatic restart.
+[Unit]
+Description=Eva shared companion coordinator (opt-in)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/jcompaniond %h/.local/state/jcompanion-eva
+UMask=0077
+Restart=no

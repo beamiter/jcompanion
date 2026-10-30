@@ -1,0 +1,9 @@
+[package]
+name = "eva-character-atlas"
+version = "0.1.0"
+edition = "2021"
+description = "Deterministic, single-body Eva ASCII character atlas"
+license = "MIT"
+
+[lib]
+path = "src/lib.rs"

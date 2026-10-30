@@ -1,0 +1,11 @@
+/target/
+*.sock
+*.lock.tmp
+__pycache__/
+
+.env
+.env.*
+/target/
+**/target/
+/crates/eva-character-atlas/qa/frames.json
+/crates/eva-character-atlas/qa/gallery.html

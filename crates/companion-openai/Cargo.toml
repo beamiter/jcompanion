@@ -1,0 +1,10 @@
+[package]
+name = "companion-openai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+jagent = { version = "0.7.0", git = "https://github.com/beamiter/jagent.git", rev = "ed03819213d8253be7687500487993233d13b1a5" }
+companion-protocol.workspace = true
