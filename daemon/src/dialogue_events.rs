@@ -145,6 +145,29 @@ fn follows(previous: &[Record], incoming: &Record) -> bool {
 }
 
 impl Journal {
+    /// The newest turn of `source` in this coordinator session that recorded
+    /// a generated reply, with every reply digest recorded for that turn.
+    pub fn latest_reply(&self, source: &str) -> Option<(String, String, Vec<String>)> {
+        self.document
+            .turns
+            .iter()
+            .rev()
+            .filter(|turn| turn.boot_id == self.boot_id && turn.source_id == source)
+            .find_map(|turn| {
+                let digests: Vec<String> = turn
+                    .events
+                    .iter()
+                    .filter_map(|record| match &record.event {
+                        Event::ReplyGenerated { content_digest, .. } => {
+                            Some(content_digest.clone())
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                (!digests.is_empty())
+                    .then(|| (turn.voice_session_id.clone(), turn.turn_id.clone(), digests))
+            })
+    }
     /// Counts recorded references for one original voice turn. A registered
     /// operation without a settled receipt stays Unknown, never complete.
     pub fn receipts(

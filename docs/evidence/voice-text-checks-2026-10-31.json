@@ -1,0 +1,395 @@
+{
+  "schema": 1,
+  "full_goal_complete": false,
+  "status": "voice_text_review_checkpoint",
+  "checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review",
+  "previous_checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536",
+  "scope": "Explicit, digest-verified review of Eva spoken replies into memory; forget; retention only while memory is unpaused and the desktop unlocked and known.",
+  "workspace_tests": {
+    "passed": 187,
+    "failed": 0,
+    "new": 9,
+    "log": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review/logs/workspace-tests.log"
+  },
+  "strict_workspace_clippy": {
+    "local_1_96": true,
+    "nightly_1_99": true
+  },
+  "rustfmt_check": true,
+  "ipc": {
+    "voice_text_contracts": {
+      "tests": 5,
+      "passed": true
+    },
+    "history_contracts": {
+      "tests": 5,
+      "passed": true
+    },
+    "withdrawal_and_legacy_contracts": {
+      "tests": 21,
+      "passed": true
+    },
+    "fault_processes": {
+      "passed": true
+    }
+  },
+  "jwm_eva": {
+    "tests_passed": 317,
+    "ignored": 11,
+    "new_tests": 3,
+    "clippy": "no new findings; package strict clippy has pre-existing findings and is not claimed",
+    "rustfmt": true
+  },
+  "real_eva_pipelines": {
+    "f9wcul9a": {
+      "passed": true,
+      "final_outcome": "noop",
+      "voice_text": null,
+      "eva_test_sha256": "9878b16802f16154702b888f7feea15b1ed439c68bfee6c023096106a1ff5f85",
+      "daemon_sha256": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a"
+    },
+    "v7y2xiex": {
+      "passed": true,
+      "final_outcome": "settled_original_operation",
+      "voice_text": null,
+      "eva_test_sha256": "9878b16802f16154702b888f7feea15b1ed439c68bfee6c023096106a1ff5f85",
+      "daemon_sha256": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a"
+    },
+    "wajbif2y": {
+      "passed": true,
+      "final_outcome": "noop",
+      "voice_text": {
+        "review": "ready",
+        "approved_source": "voice:eva-2266323-7001-2:eva-7001-1-1",
+        "scope": "global",
+        "forget": "voice_text_forgotten",
+        "after_forget": "voice_text_not_retained"
+      },
+      "eva_test_sha256": "9878b16802f16154702b888f7feea15b1ed439c68bfee6c023096106a1ff5f85",
+      "daemon_sha256": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a"
+    }
+  },
+  "frontend_eva_tests": {
+    "forge": "13 passed, 4 ignored",
+    "anvil": "15 passed, 3 ignored",
+    "ember": "18 + 6 passed",
+    "frost": "19 passed"
+  },
+  "frontend_clippy_eva_companion": {
+    "forge": 3,
+    "anvil": 3,
+    "ember": 0,
+    "frost": 1,
+    "note": "equal to the pre-change baseline"
+  },
+  "native_voice_text_cases": {
+    "forge": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review/native/forge/voice-text-report.json",
+      "binary_sha256": {
+        "jcompaniond": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a",
+        "forge": "0ae0c0336ff030d1b03ea453ea9d78682ddf950c05b77bbe89d87e29aee921b5"
+      },
+      "final_entries": [
+        {
+          "scope": "global",
+          "source": "voice:native-activation:native-turn-1"
+        }
+      ],
+      "stages": [
+        {
+          "label": "forge-v0-eva-turn",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "467560f259290a0e1c6fee268fb626339c554d178caf6e8f988345395a63751e"
+        },
+        {
+          "label": "forge-v1-global-buttons",
+          "note": "Global scope chosen explicitly; voice buttons visible",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "c49d15fcb1169c1ebd31fec83adceb03e5f1c1c428f6745353d859edc30ee8f1"
+        },
+        {
+          "label": "forge-v2-review-requested",
+          "note": "coordinator asked Eva; verified text shown as exact-change review",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "b43ec365c80239676cc8c49bdb429e408b3c935708f81c09f61a53da92f57e0e"
+        },
+        {
+          "label": "forge-v3-review-text",
+          "note": "exact proposed value with voice source; not saved",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "cc074a19919869feee97bc3c5ccce52a142fe461273b91e54e72a76da92bc46d"
+        },
+        {
+          "label": "forge-v4-approve-area",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "a8841d372b604d73a090429e5d5a40c35af51b89363e0fedaeacf6418e15ac90"
+        },
+        {
+          "label": "forge-v5-approved",
+          "note": "explicit approval commits one global entry with voice source",
+          "rows": 1,
+          "retained": 1,
+          "capture_sha256": "0a82647ec7928c6892f2d92288c7f7e3ef5013cf65d2b206eb504cc75f90fd5a"
+        },
+        {
+          "label": "forge-v6-forgotten",
+          "note": "Eva dropped retained text",
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "1b534c043335329edbfbeb9f352238c69e1cc0b3aaa80874afec14e9aef107e6"
+        },
+        {
+          "label": "forge-v7-not-retained",
+          "note": "after forget no text can be offered",
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "e5d2ff7621fa77ae98f556500df3c366e01da85c8169654ac0182bbb1bdab6c4"
+        }
+      ],
+      "manual_review": "Global chosen explicitly; review showed the exact value with source voice:native-activation:native-turn-1 and wrote nothing; approval committed one Global row; forget dropped Eva text; a new request reported it is no longer held."
+    },
+    "anvil": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review/native/anvil/voice-text-report.json",
+      "binary_sha256": {
+        "jcompaniond": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a",
+        "anvil": "d5b12ce60dce37fce02167b1fe748ee347899b0e571ed3bc308027a35cdd2d20"
+      },
+      "final_entries": [
+        {
+          "scope": "global",
+          "source": "voice:native-activation:native-turn-1"
+        }
+      ],
+      "stages": [
+        {
+          "label": "anvil-v0-eva-turn",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "6b5ed48e3e3397f2c5ad7f6fe328b4dc95755cb934258c7edb58604da53c88e1"
+        },
+        {
+          "label": "anvil-v1-global-buttons",
+          "note": "Global scope chosen explicitly; voice buttons visible",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "6ddb6d2d04a045bd960e12db8c6cf1ead4a19e7575d73b89f1528868c66e47db"
+        },
+        {
+          "label": "anvil-v2-review-requested",
+          "note": "verified text shown as exact-change review",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "191a50c4ff077303b8e7369e9260dbfce9ee0eefe2cf5398b24bd0b773bbe3b8"
+        },
+        {
+          "label": "anvil-v3-approve-area",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "8a4cf604482b08314168531c4cfc0d6f8b97fc7e3796763d251e7b48c516a8d3"
+        },
+        {
+          "label": "anvil-v4-approved",
+          "note": "explicit approval commits global entry with voice source",
+          "rows": 1,
+          "retained": 1,
+          "capture_sha256": "d13b084ebcc991c812f72e3a562470e1c9784c87c31e67a89e4665dc0848d5d3"
+        },
+        {
+          "label": "anvil-v5-forgotten",
+          "note": null,
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "e57b79b685f2b431e34ec6f981e6725b3943c3598d0e75a0420695ceda0bed6d"
+        },
+        {
+          "label": "anvil-v6-not-retained",
+          "note": null,
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "5abce0de8757601c94bd80832d02e088f243fa5c7f9c09b8ff1d3f94a10e3918"
+        }
+      ],
+      "manual_review": "Same sequence and outcome as Forge."
+    },
+    "ember": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review/native/ember/voice-text-report.json",
+      "binary_sha256": {
+        "jcompaniond": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a",
+        "ember": "e6f3ec81f237881e92aa56e931daaaa10fef9c611a77c2d4217a34d92c35cf02"
+      },
+      "final_entries": [
+        {
+          "scope": "global",
+          "source": "voice:native-activation:native-turn-1"
+        }
+      ],
+      "stages": [
+        {
+          "label": "ember-v0-eva-turn",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "509948c331d27c3e775cfe5f6bf15b22daa0ca43c54a17ce719ea30c006e5024"
+        },
+        {
+          "label": "ember-card-bottom",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "fe6c08ce3e3c2cad8ce4fc3ac4bcbfe65c3bc11b17035c40879409d9fda731e0"
+        },
+        {
+          "label": "ember-mem1",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "780d2116f56ebe462d292a5ac31da9fcb3aa4aaa170038f568a85782ca64d65f"
+        },
+        {
+          "label": "ember-v1-global-buttons",
+          "note": "Global scope chosen explicitly; review enabled",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "5de296a04dd54c187284cb8d90dc41d692172cc9a6e895fc0b976eec8ee84348"
+        },
+        {
+          "label": "ember-v2-review-requested",
+          "note": "verified text shown as exact-change review",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "cf8ba234289135ae578752b5df4381d711fc7ac534c3ae2a1bb1c57aa1793571"
+        },
+        {
+          "label": "ember-v3-review-text",
+          "note": "exact proposed value with voice source",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "2b299ec82c68aa84c1c64fa115abc1f390708de7be5c94b34c0d7f50d20912e4"
+        },
+        {
+          "label": "ember-v4-approved",
+          "note": "explicit approval commits global entry with voice source",
+          "rows": 1,
+          "retained": 1,
+          "capture_sha256": "5e29cf16e9806972a7e2c020c9ac5cd64d115d9ec02d139095dc060baff83b6e"
+        },
+        {
+          "label": "ember-find-forget",
+          "note": null,
+          "rows": 1,
+          "retained": 1,
+          "capture_sha256": "0743a471f21543ad8f9ef868076f482435294d034138d22ea68d03874de83525"
+        },
+        {
+          "label": "ember-v5-forgotten",
+          "note": "Eva dropped retained text",
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "966366187488ee7bf75f2ad6cd8e5458cc4a28f603d39594e1f95f78cd206286"
+        },
+        {
+          "label": "ember-v6-not-retained",
+          "note": "after forget no text can be offered",
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "996e112792311f6296196041b17e22e8fbec54bada5085892f08f17f1676d6c5"
+        }
+      ],
+      "manual_review": "Review button disabled until Global was chosen; then the same request, exact review, approval, forget and not-retained sequence."
+    },
+    "frost": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-text-review/native/frost/voice-text-report.json",
+      "binary_sha256": {
+        "jcompaniond": "bb3e103bc9bcfb9de5bdb51c7696fbf5c0abe8d8f78e1b1fd07632a900f17f7a",
+        "frost": "6d0c59a843696bd96b415c9c7b4f632f7e4da039aa6177699ede222bd070b888"
+      },
+      "final_entries": [
+        {
+          "scope": "global",
+          "source": "voice:native-activation:native-turn-1"
+        }
+      ],
+      "stages": [
+        {
+          "label": "frost-v0-eva-turn",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "0075fb9556892bced926069c876c1ae0cb6d8768834afe652146ebbe39de6176"
+        },
+        {
+          "label": "frost-mem",
+          "note": null,
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "d408183388904784b9fd5473c730edf33944f9ec325dcb64acbce47822734bde"
+        },
+        {
+          "label": "frost-v1-scope-required",
+          "note": "no task and Global not chosen: request not sent",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "168d84cdccb97c86f5fed60c2a6bd686066554ed7b2de8441acbbd8e23c5121f"
+        },
+        {
+          "label": "frost-v2-review-requested",
+          "note": "verified text shown as exact-change review",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "2d1a5191196a337e8ec8da676763a0f736e8f428f66399ea4237bbc8a8473d0a"
+        },
+        {
+          "label": "frost-v3-review-text",
+          "note": "exact proposed value with voice source",
+          "rows": 0,
+          "retained": 1,
+          "capture_sha256": "42158b6b4f32d1ee0c67ad118930a6aadc22fe38bf8986862ef457e156dd3093"
+        },
+        {
+          "label": "frost-v4-approved",
+          "note": "explicit approval commits global entry with voice source",
+          "rows": 1,
+          "retained": 1,
+          "capture_sha256": "9af939b9cf86095d7ca5b154aeb16f82f631f04dc3de1c8564258072d39fd851"
+        },
+        {
+          "label": "frost-v5-forgotten",
+          "note": null,
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "3dc38a913b43faf904f0e043240be1181987f11f4492701947f6c26fb8475687"
+        },
+        {
+          "label": "frost-v6-not-retained",
+          "note": null,
+          "rows": 1,
+          "retained": 0,
+          "capture_sha256": "892005e94e998540c1a89df4f9f65d861c113ea349f385614345b09935c6d841"
+        }
+      ],
+      "manual_review": "Without a chosen scope the request was refused locally; with Global the same review, approval, forget and not-retained sequence."
+    }
+  },
+  "native_environment": "Private Xvfb 1600x1200, metacity xrender, private DBus/HOME/XDG/profile, offline route; the driver is a protocol-level dialogue v3 Eva that records a reply digest and answers from memory.",
+  "ci": {
+    "jcompanion": "green after fixing a Rust 1.99 clippy lint in existing voice test code",
+    "frontends_and_jwm": "pre-existing failing steps unchanged by these commits"
+  },
+  "limitations": [
+    "No live microphone, physical audio, official API or installed service change",
+    "Native checks use a protocol-level Eva; the real Eva retention path is covered by the private pipeline with a replayed Realtime server",
+    "User words are included only as the provider caption when input_transcription is explicitly enabled (at most 160 characters)",
+    "No voice-only save trigger; saving starts from a terminal",
+    "Screenshots reviewed manually; no OCR assertions"
+  ],
+  "publication": "Pushed to master with this summary; commit IDs are in the local push receipt."
+}

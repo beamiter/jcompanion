@@ -311,6 +311,13 @@ impl Ledger {
     pub fn journal_failed(&self) -> bool {
         self.journal_failed
     }
+    /// See [`crate::dialogue_events::Journal::latest_reply`].
+    pub fn latest_voice_reply(&self, source: &str) -> Option<(String, String, Vec<String>)> {
+        if self.journal_failed {
+            return None;
+        }
+        self.voice_events.as_ref()?.latest_reply(source)
+    }
     pub fn voice_event(
         &mut self,
         source: &str,

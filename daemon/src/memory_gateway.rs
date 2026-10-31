@@ -41,6 +41,10 @@ impl Gateway {
             reviews: HashMap::new(),
         }
     }
+    /// Unavailable storage counts as paused: nothing may be retained for it.
+    pub fn paused(&self) -> bool {
+        self.store.as_ref().is_none_or(|s| s.paused())
+    }
     pub fn invalidate(&mut self, peer: u64) {
         self.scope_reviews.retain(|_, r| r.0 != peer);
         self.grants.remove(&peer);

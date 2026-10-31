@@ -38,3 +38,6 @@ jobs:
       - name: Dialogue history IPC contracts
         # Negotiation, scope isolation, lock withdrawal, paging and restart text loss.
         run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/history_contracts.py --binary target/debug/jcompaniond --report target/history-contracts.json
+      - name: Voice text review IPC contracts
+        # Digest-verified offers, explicit approval, pause/lock retention, forget, timeout and compatibility.
+        run: timeout 90s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/voice_text_contracts.py --binary target/debug/jcompaniond --report target/voice-text-contracts.json

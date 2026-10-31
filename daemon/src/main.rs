@@ -8,6 +8,7 @@ mod providers;
 mod storage;
 mod task_authority;
 mod task_facts;
+mod voice_text;
 use companion_client::Framed;
 use companion_core::{
     behavior::{Facts, FocusPolicy, Motion, Scheduler, Work},
@@ -45,6 +46,12 @@ struct Peer {
     voice_dialogue: bool,
     /// Negotiated `DialogueHistoryV1`; only such hosts receive history replies.
     history: bool,
+    /// Host negotiated `VoiceTextV1`.
+    voice_text_host: bool,
+    /// Eva negotiated dialogue version 3 (request-bound voice text).
+    voice_text: bool,
+    /// Retention state last pushed to this Eva connection.
+    voice_retention: Option<bool>,
     io: Framed,
     host: Option<Host>,
     seq: u64,
@@ -238,6 +245,8 @@ fn run() -> io::Result<()> {
     let mut history_failure_reported = provider.ledger.journal_failed();
     let mut turn_owners = HashMap::<String, (u64, ContextRef)>::new();
     let mut history_withheld = false;
+    let mut voice_pending: Option<voice_text::Pending> = None;
+    let mut voice_ids = 0u64;
     loop {
         // Every path that locks the desktop or loses its observer converges
         // here; negotiated hosts clear any history page they show.
@@ -250,6 +259,27 @@ fn run() -> io::Result<()> {
             }
         }
         history_withheld = withheld;
+        // Eva may hold recent spoken text only while memory accepts writes
+        // and the desktop is unlocked and known; otherwise it keeps nothing.
+        let retention = !withheld && !memories.paused();
+        for p in peers.values_mut().filter(|p| p.voice_text) {
+            if p.voice_retention != Some(retention) {
+                p.queue(&companion_voice::text::Push::Retention { enabled: retention })?;
+                p.voice_retention = Some(retention);
+            }
+        }
+        if voice_pending
+            .as_ref()
+            .is_some_and(|v| Instant::now() >= v.deadline)
+        {
+            let v = voice_pending.take().expect("checked pending relay");
+            if let Some(p) = peers.get_mut(&v.host) {
+                p.queue(&Reply::VoiceText {
+                    request_id: v.host_request,
+                    status: "voice_text_timeout".into(),
+                })?;
+            }
+        }
         loop {
             match listener.accept() {
                 Ok((s, _)) => {
@@ -281,6 +311,9 @@ fn run() -> io::Result<()> {
                             voice_clocked_since: None,
                             voice_dialogue: false,
                             history: false,
+                            voice_text_host: false,
+                            voice_text: false,
+                            voice_retention: None,
                             io: Framed::new(s)?,
                             host: None,
                             seq: 0,
@@ -323,8 +356,14 @@ fn run() -> io::Result<()> {
                 Err(_) => dead.push(id),
             }
         }
+        let mut voice_answers = Vec::new();
+        let mut voice_pushes = Vec::new();
         for (id, bytes) in incoming {
             let live_hosts: Vec<Host> = peers.values().filter_map(|p| p.host.clone()).collect();
+            let voice_peer = peers
+                .iter()
+                .find(|(_, p)| p.voice_text)
+                .and_then(|(id, p)| p.eva.clone().map(|source| (*id, source)));
             if dead.contains(&id) || peers.get(&id).is_some_and(|p| p.delivery_failed) {
                 continue;
             }
@@ -386,8 +425,13 @@ fn run() -> io::Result<()> {
                             commit(&store, &mut state, change, &mut peers)?;
                         }
                     } else if matches!(e.body, Request::EvaHello) {
-                        let dialogue =
-                            matches!(extension, Some(companion_voice::Extension::HelloDialogue));
+                        let dialogue_version = match extension.as_ref() {
+                            Some(companion_voice::Extension::HelloDialogue(version)) => {
+                                Some(*version)
+                            }
+                            _ => None,
+                        };
+                        let dialogue = dialogue_version.is_some();
                         let clocked = dialogue
                             || matches!(extension, Some(companion_voice::Extension::Hello));
                         let clock = companion_voice::boottime_ns();
@@ -407,15 +451,16 @@ fn run() -> io::Result<()> {
                             if clocked {
                                 p.voice_clocked_since = clock;
                                 p.voice_dialogue = dialogue;
+                                p.voice_text =
+                                    dialogue_version == Some(companion_voice::text::VERSION);
                                 let accepted = companion_voice::Accepted::new(
                                     state.boot_id.clone(),
                                     state.companion_id.clone(),
                                     session.clone(),
                                 );
-                                p.queue(&if dialogue {
-                                    accepted.with_dialogue()
-                                } else {
-                                    accepted
+                                p.queue(&match dialogue_version {
+                                    Some(version) => accepted.with_dialogue_version(version),
+                                    None => accepted,
                                 })?;
                             } else {
                                 p.queue(&Reply::Accepted {
@@ -456,6 +501,7 @@ fn run() -> io::Result<()> {
                                 // decode() admits only supported ordered sets;
                                 // accept exactly what this host requested.
                                 p.history = features.contains(&HostFeature::DialogueHistoryV1);
+                                p.voice_text_host = features.contains(&HostFeature::VoiceTextV1);
                                 let nonce = random_id()?;
                                 p.admission.negotiate(nonce.clone());
                                 p.queue(&Reply::HostAccepted {
@@ -541,6 +587,40 @@ fn run() -> io::Result<()> {
                         } else {
                             p.seq = e.source_seq;
                             p.events.insert(e.event_id);
+                            if let Some(
+                                answer @ (companion_voice::Extension::TextOffer(_)
+                                | companion_voice::Extension::TextUnavailable { .. }
+                                | companion_voice::Extension::TextForgotten { .. }),
+                            ) = extension.as_ref()
+                            {
+                                let request = match answer {
+                                    companion_voice::Extension::TextOffer(offer) => {
+                                        offer.request_id
+                                    }
+                                    companion_voice::Extension::TextUnavailable {
+                                        request_id,
+                                        ..
+                                    }
+                                    | companion_voice::Extension::TextForgotten {
+                                        request_id,
+                                        ..
+                                    } => *request_id,
+                                    _ => unreachable!("matched text answers"),
+                                };
+                                if !p.voice_text
+                                    || voice_pending
+                                        .as_ref()
+                                        .is_none_or(|v| v.eva != id || v.id != request)
+                                {
+                                    p.queue(&Reply::OperationError {
+                                        operation: "voice_text".into(),
+                                        reason: "voice_text_not_requested".into(),
+                                    })?;
+                                } else {
+                                    voice_answers.push(answer.clone());
+                                }
+                                continue;
+                            }
                             match e.body {
                                 Request::VoiceContext {
                                     session_id: voice_session,
@@ -978,6 +1058,111 @@ fn run() -> io::Result<()> {
                                         status: error,
                                     });
                                 p.queue(&reply)?;
+                                None
+                            }
+                            Request::VoiceTextReview {
+                                request_id,
+                                context,
+                                scope,
+                            } => {
+                                let refused = if !p.voice_text_host {
+                                    Some("voice_text_not_negotiated")
+                                } else if p.context.as_ref() != Some(&context) {
+                                    Some("stale_context")
+                                } else if unix_millis() == 0
+                                    || state.locked
+                                    || (state.desktop_observed && !state.desktop_known)
+                                {
+                                    Some("desktop_locked_or_unknown")
+                                } else if memories.paused() {
+                                    Some("memory_paused")
+                                } else if !memory_gateway::Gateway::scopes_allowed(
+                                    &context,
+                                    std::slice::from_ref(&scope),
+                                ) {
+                                    Some("memory_scope_denied")
+                                } else if voice_pending.is_some() {
+                                    Some("voice_text_busy")
+                                } else {
+                                    None
+                                };
+                                let status = match (refused, voice_peer.as_ref()) {
+                                    (Some(reason), _) => reason,
+                                    (None, None) => "voice_text_eva_unavailable",
+                                    (None, Some((eva, source))) => {
+                                        match provider.ledger.latest_voice_reply(source) {
+                                            None => "voice_text_no_reply",
+                                            Some((voice_session_id, turn_id, digests)) => {
+                                                voice_ids += 1;
+                                                voice_pushes.push((
+                                                    *eva,
+                                                    companion_voice::text::Push::Request {
+                                                        request_id: voice_ids,
+                                                        voice_session_id: voice_session_id.clone(),
+                                                        turn_id: turn_id.clone(),
+                                                    },
+                                                ));
+                                                voice_pending = Some(voice_text::Pending {
+                                                    id: voice_ids,
+                                                    host: id,
+                                                    host_request: request_id,
+                                                    context,
+                                                    eva: *eva,
+                                                    kind: voice_text::Kind::Review {
+                                                        scope,
+                                                        voice_session_id,
+                                                        turn_id,
+                                                        digests,
+                                                    },
+                                                    deadline: Instant::now() + voice_text::DEADLINE,
+                                                });
+                                                "voice_text_requested"
+                                            }
+                                        }
+                                    }
+                                };
+                                p.queue(&Reply::VoiceText {
+                                    request_id,
+                                    status: status.into(),
+                                })?;
+                                None
+                            }
+                            Request::VoiceTextForget {
+                                request_id,
+                                context,
+                            } => {
+                                // Forgetting reveals nothing, so a lock does not block it.
+                                let status = if !p.voice_text_host {
+                                    "voice_text_not_negotiated"
+                                } else if p.context.as_ref() != Some(&context) {
+                                    "stale_context"
+                                } else if voice_pending.is_some() {
+                                    "voice_text_busy"
+                                } else if let Some((eva, _)) = voice_peer.as_ref() {
+                                    voice_ids += 1;
+                                    voice_pushes.push((
+                                        *eva,
+                                        companion_voice::text::Push::Forget {
+                                            request_id: voice_ids,
+                                        },
+                                    ));
+                                    voice_pending = Some(voice_text::Pending {
+                                        id: voice_ids,
+                                        host: id,
+                                        host_request: request_id,
+                                        context,
+                                        eva: *eva,
+                                        kind: voice_text::Kind::Forget,
+                                        deadline: Instant::now() + voice_text::DEADLINE,
+                                    });
+                                    "voice_text_requested"
+                                } else {
+                                    "voice_text_eva_unavailable"
+                                };
+                                p.queue(&Reply::VoiceText {
+                                    request_id,
+                                    status: status.into(),
+                                })?;
                                 None
                             }
                             Request::DialogueHistory {
@@ -1673,12 +1858,100 @@ fn run() -> io::Result<()> {
                 }
             }
         }
+        for (eva, push) in voice_pushes {
+            if let Some(p) = peers.get_mut(&eva) {
+                p.queue(&push)?;
+            }
+        }
+        for answer in voice_answers {
+            let Some(pending) = voice_pending.take() else {
+                continue;
+            };
+            let status = match (answer, pending.kind) {
+                (
+                    companion_voice::Extension::TextOffer(offer),
+                    voice_text::Kind::Review {
+                        scope,
+                        voice_session_id,
+                        turn_id,
+                        digests,
+                    },
+                ) => {
+                    if peers.get(&pending.host).and_then(|p| p.context.as_ref())
+                        != Some(&pending.context)
+                    {
+                        "stale_context".to_owned()
+                    } else if state.locked || (state.desktop_observed && !state.desktop_known) {
+                        "desktop_locked_or_unknown".into()
+                    } else {
+                        match voice_text::proposal(
+                            &offer,
+                            scope,
+                            &voice_session_id,
+                            &turn_id,
+                            &digests,
+                        ) {
+                            Err(reason) => reason.into(),
+                            Ok(change) => match memories.handle(
+                                pending.host,
+                                Some(&pending.context),
+                                &Request::MemoryPropose {
+                                    context: pending.context.clone(),
+                                    change,
+                                },
+                                unix_millis(),
+                            ) {
+                                Ok(review) => {
+                                    if let Some(p) = peers.get_mut(&pending.host) {
+                                        p.queue(&review)?;
+                                    }
+                                    "voice_text_review_ready".into()
+                                }
+                                Err(reason) => reason,
+                            },
+                        }
+                    }
+                }
+                (companion_voice::Extension::TextUnavailable { reason, .. }, _) => match reason {
+                    companion_voice::text::Unavailable::NotRetained => "voice_text_not_retained",
+                    companion_voice::text::Unavailable::RetentionPaused => {
+                        "voice_text_retention_paused"
+                    }
+                }
+                .into(),
+                (companion_voice::Extension::TextForgotten { .. }, voice_text::Kind::Forget) => {
+                    "voice_text_forgotten".into()
+                }
+                _ => "voice_text_unexpected_answer".into(),
+            };
+            if let Some(p) = peers.get_mut(&pending.host) {
+                p.queue(&Reply::VoiceText {
+                    request_id: pending.host_request,
+                    status,
+                })?;
+            }
+        }
         dead.extend(
             peers
                 .iter()
                 .filter(|(_, p)| p.delivery_failed)
                 .map(|(id, _)| *id),
         );
+        if let Some(pending) = voice_pending.take() {
+            if dead.contains(&pending.eva) || dead.contains(&pending.host) {
+                if let Some(p) = peers
+                    .get_mut(&pending.host)
+                    .filter(|_| !dead.contains(&pending.host))
+                {
+                    p.queue(&Reply::VoiceText {
+                        request_id: pending.host_request,
+                        status: "voice_text_eva_unavailable".into(),
+                    })?;
+                }
+            } else {
+                voice_pending = Some(pending);
+            }
+        }
         for id in dead {
             if let Some(p) = peers.remove(&id) {
                 memories.invalidate(id);
