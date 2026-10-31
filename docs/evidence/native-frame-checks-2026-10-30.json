@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "date": "2026-10-30",
+  "scope": "Local source continuation; sampled native X11 submission/fault evidence, not full product/hardware acceptance",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "source_base_commits": {
+    "jcompanion": "9aa569540091524d637a7115b64c587b9177a55b",
+    "jwm": "982152b6ca40781a88478a789b45432a30660a26",
+    "ember": "c21dbf62d908ba869a97b9d1d4beace7faefc7bf",
+    "forge": "58495ae55fafbd30c5998d936e5014aef8671910",
+    "anvil": "d76a33a300d10055fa89d370335c43fb2b03c729",
+    "frost": "cdaa2a966de6c8cf8bfd90809397b8660b7f6ed6"
+  },
+  "source_files_sha256": {
+    "jwm/src/backend/x11/compositor/frame_sync.rs": "ab6821b4a4ff237b762e4e23cbe90ac49218ef1f474b1b701ed3441d7f14e7f3",
+    "jwm/src/backend/x11/compositor/render.rs": "6c16ebaa746483f9260fdaa0e8faa74aacb9ca9aba8923806080cdae83b68ae9",
+    "ember/src/ui.rs": "18f721938e5d28ad192184b60af1fc4891b4534cd2f0a0ea631b15b2e1a4faa6",
+    "jcompanion/tests/native_windows.py": "e2a507c46651a6ddf941a25bb8b1118f91e364c11f47bd752e4577e5c99f5f8f"
+  },
+  "binaries": {
+    "jwm": {
+      "path": "/tmp/eva-jwm-target/debug/jwm",
+      "sha256": "b9a070a7ca84e2e2b0727d3bedeead1686da76b0ec81eeb138f127cf329ea2f9"
+    },
+    "ember": {
+      "path": "/tmp/eva-egui-target/debug/ember",
+      "sha256": "0fe63cb9b69a0deeb10de956ed8c828b06e9ee6c563f9cbc7bdd61641a543e09"
+    },
+    "jcompaniond": {
+      "path": "/home/yj/projects/jcompanion/target/debug/jcompaniond",
+      "sha256": "5797ac91cccfdeb81f1aba495c1898f7525075e80326f84ab2df31216f9282ae"
+    },
+    "forge": {
+      "path": "/tmp/eva-native-target/debug/forge",
+      "sha256": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080"
+    },
+    "anvil": {
+      "path": "/tmp/eva-native-target/debug/anvil",
+      "sha256": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba"
+    },
+    "frost": {
+      "path": "/tmp/eva-egui-target/debug/frost",
+      "sha256": "dd5206a492f064cda34597e9eed39bc6eccb061e2998a0b48361e2a8cbac3f7a"
+    },
+    "jsh_existing_install": {
+      "path": "/home/yj/.cargo/bin/jsh",
+      "sha256": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+    }
+  },
+  "checks": [
+    {
+      "name": "JWM compositor tests",
+      "result": "passed",
+      "passed": 297,
+      "failed": 0,
+      "ignored": 0,
+      "log": "native-frame-checks-2026-10-30/jwm-compositor-tests.txt",
+      "command": "cargo test --locked --offline --lib --no-default-features --features backend-x11rb backend::x11::compositor:: --target-dir /tmp/eva-jwm-target -j 2 --config profile.dev.debug=0 -- --test-threads=2"
+    },
+    {
+      "name": "JWM strict all-target Clippy (x11rb)",
+      "result": "passed",
+      "log": "native-frame-checks-2026-10-30/jwm-clippy.txt",
+      "command": "cargo clippy --locked --offline --all-targets --no-default-features --features backend-x11rb --target-dir /tmp/eva-jwm-target -j 2 -- -D warnings"
+    },
+    {
+      "name": "JWM XCB compilation",
+      "result": "passed",
+      "log": "native-frame-checks-2026-10-30/jwm-xcb-check.txt",
+      "command": "cargo check --locked --offline --no-default-features --features backend-xcb --target-dir /tmp/eva-jwm-target -j 2",
+      "native_xcb_executed": false
+    },
+    {
+      "name": "JWM rustfmt modified Rust files",
+      "result": "passed",
+      "log": "native-frame-checks-2026-10-30/jwm-format.txt",
+      "note": "skip_children=true; one pre-existing test assertion formatted in the touched ring-buffer file"
+    },
+    {
+      "name": "Ember shared-atlas padding regression before fix",
+      "result": "expected failure reproduced",
+      "passed": 0,
+      "failed": 1,
+      "log": "native-frame-checks-2026-10-30/ember-padding-before.txt"
+    },
+    {
+      "name": "Ember active-companion geometry and guards after fix",
+      "result": "passed",
+      "passed": 6,
+      "failed": 0,
+      "log": "native-frame-checks-2026-10-30/ember-padding-after.txt",
+      "command": "cargo test --locked --offline --lib active_companion --target-dir /tmp/eva-egui-target -j 2 --config profile.dev.debug=0"
+    },
+    {
+      "name": "Ember broader UI suite",
+      "result": "failed",
+      "passed": 77,
+      "failed": 2,
+      "log": "native-frame-checks-2026-10-30/ember-ui-current.txt"
+    },
+    {
+      "name": "Ember clean baseline UI suite",
+      "result": "same failures reproduced",
+      "base": "c21dbf62d908ba869a97b9d1d4beace7faefc7bf",
+      "worktree": "/tmp/eva-ember-baseline-20261030",
+      "passed": 77,
+      "failed": 2,
+      "log": "native-frame-checks-2026-10-30/ember-ui-clean-baseline.txt",
+      "note": "Same locked dependencies, local vendor patches resolved to unchanged original vendor directories; worktree remained clean"
+    },
+    {
+      "name": "Native runner Python compilation",
+      "result": "passed",
+      "command": "python3 -m py_compile tests/native_windows.py"
+    },
+    {
+      "name": "Shared ring-buffer existing reclaim-deadline tests",
+      "result": "passed",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "log": "native-frame-checks-2026-10-30/jwm-reclaim-deadline-tests.txt",
+      "command": "cargo test --locked --offline -p shared_structures --lib reclaim_probe_disappearance --target-dir /tmp/eva-jwm-target -j 2 --config profile.dev.debug=0"
+    },
+    {
+      "name": "JWM current-source production rebuild after test-only formatting",
+      "result": "passed; binary identical to all final native reports",
+      "sha256": "b9a070a7ca84e2e2b0727d3bedeead1686da76b0ec81eeb138f127cf329ea2f9",
+      "log": "native-frame-checks-2026-10-30/jwm-build-current.txt"
+    }
+  ],
+  "ui_baseline_failures": [
+    "ui::tests::actual_egui_panel_allocation_keeps_files_and_large_fonts_out_of_native_budget",
+    "ui::tests::foreground_footer_uses_one_reduced_native_viewport_without_moving_ime_origin"
+  ],
+  "native_reports": {
+    "forge-anvil": {
+      "report": "native-jwm-forge-anvil-2026-10-30/report.json",
+      "expected_pass": true
+    },
+    "ember-forge": {
+      "report": "native-jwm-ember-forge-2026-10-30/report.json",
+      "expected_pass": true
+    },
+    "frost-forge": {
+      "report": "native-jwm-frost-forge-2026-10-30/report.json",
+      "expected_pass": true
+    },
+    "negative": {
+      "report": "native-jwm-negative-2026-10-30/report.json",
+      "expected_pass": false
+    }
+  },
+  "environment": {
+    "display": "private Xvfb X11; JWM backend-x11rb",
+    "compositor": "GLX llvmpipe, actual renderer recorded in retained jwm.log",
+    "gtk_renderer": "Cairo",
+    "ember_renderer": "WGPU, recorded in retained ember.log",
+    "task_fixture": "Existing immutable jsh 0.2.0 snapshot; actual GUI printf command and verified private result marker",
+    "isolation": "Private home, XDG dirs, no DBus service activation, own process groups only; no API/microphone use"
+  },
+  "limitations": [
+    "Three two-window pairings, not simultaneous four-host multi-instance/split coverage",
+    "Sampled PNGs and later journal reads are not atomic or continuous physical proof",
+    "Default Cat ink detector excludes Compact/high-contrast/other skins; zero matches is not absence proof",
+    "Native submission/swap feedback is not a companion CompositorPresented certificate",
+    "Physical scanout, Wayland, IME, audio/API and performance gates remain open"
+  ]
+}

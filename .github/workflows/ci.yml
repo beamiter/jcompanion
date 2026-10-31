@@ -22,6 +22,16 @@ jobs:
         run: cargo +stable clippy --workspace --all-targets --locked -- -D warnings
       - name: Build coordinator
         run: cargo +stable build --locked -p jcompaniond
+      - name: Default Cat screenshot-oracle regressions
+        # Real native crop plus explicitly synthetic two-body image fixtures.
+        # This tests the image oracle, not GPU/native/physical uniqueness.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pil
+          /usr/bin/python3 tests/test_native_body_classifier.py
       - name: Local IPC and process fault contract
         # These mock hosts test protocol/process behavior, not native pixel removal.
         run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/fault_processes.py target/debug/jcompaniond
+      - name: Withdrawal, residence, context, memory and voice IPC contracts
+        # Real coordinator, fresh offline profiles; no model/audio/display calls.
+        run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/withdrawal_contracts.py --binary target/debug/jcompaniond --report target/ipc-contracts.json

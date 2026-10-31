@@ -9,3 +9,7 @@ __pycache__/
 **/target/
 /crates/eva-character-atlas/qa/frames.json
 /crates/eva-character-atlas/qa/gallery.html
+
+# Local native-test captures, binaries and reconstruction snapshots.
+/eva-native-*/
+/docs/evidence/*/

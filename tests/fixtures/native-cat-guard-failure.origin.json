@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "scope": "Real private X11 sample crop used only for image-classifier unit tests; synthetic copies in tests are not native or physical uniqueness evidence.",
+  "raw_source": "/tmp/eva-native-5l5eu0v4/014-failed-window-use.png",
+  "archived_source": "docs/evidence/native-withdrawal-final-regression-ember-busy-background-failed-5l5eu0v4-2026-10-31/014-failed-window-use.png",
+  "source_png_sha256": "5618e07b3ee47ab9a145650d5d1d29b81067675d651f93101896a7299dfed60f",
+  "root_crop": [
+    400,
+    730,
+    640,
+    920
+  ],
+  "expected_bodies": 1,
+  "explanation": "One default Cat plus the authored GuardFailure Dim/Effect cloud. Source atlas palette has Outline/Accent ratios above 0.2 versus Dim near 0.1."
+}

@@ -1,7 +1,7 @@
 //! Daemon-only network worker. curl is executed directly (never a shell); keys
 //! travel through stdin, not arguments, frontend payloads, Debug, or logs.
 //! No transport is invoked except by a successful explicit start().
-use crate::dialogue::{Ledger, Route};
+use crate::dialogue::{Ledger, Publisher, Route};
 use companion_openai::{self as adapter, Config, ContextRef, Error, Suggestion, UserTurn};
 use std::{
     collections::BTreeSet,
@@ -245,12 +245,23 @@ impl Service {
     }
     /// Caller must authenticate host, exact current context, and one-use selection
     /// consent before this method. Raw filesystem/scrollback collection is absent.
+    #[cfg(test)]
     pub fn start(
         &mut self,
         turn: UserTurn,
         identity: &str,
         memory: &[String],
         targets: BTreeSet<String>,
+    ) -> Result<(), Error> {
+        self.start_owned(turn, identity, memory, targets, None)
+    }
+    pub fn start_owned(
+        &mut self,
+        turn: UserTurn,
+        identity: &str,
+        memory: &[String],
+        targets: BTreeSet<String>,
+        publisher: Option<Publisher>,
     ) -> Result<(), Error> {
         if !self.config.enabled {
             return Err(Error::Disabled);
@@ -263,7 +274,7 @@ impl Service {
         }
         let body = adapter::request(&self.config, &turn, identity, memory, &targets)?;
         self.ledger
-            .begin(&turn.turn_id, turn.context.clone(), Route::TextResponses)?;
+            .begin_input(&turn, Route::TextResponses, publisher)?;
         let cancel = Arc::new(AtomicBool::new(false));
         self.active = Some(Active {
             turn_id: turn.turn_id.clone(),
@@ -336,10 +347,18 @@ impl Service {
                 },
             )
         }
-        let _ = self
-            .ledger
-            .account(&c.turn_id, self.config.model.clone(), c.usage.clone());
-        let _ = self.ledger.finish(&c.turn_id, c.result.is_ok());
+        let accounting =
+            self.ledger
+                .account(&c.turn_id, self.config.model.clone(), c.usage.clone());
+        let recorded = match &c.result {
+            Ok(reply) => self.ledger.finish_output(&c.turn_id, &reply.reply),
+            Err(_) => self.ledger.finish(&c.turn_id, false),
+        };
+        if accounting == Err(Error::LocalHistoryUnavailable)
+            || recorded == Err(Error::LocalHistoryUnavailable)
+        {
+            c.result = Err(Error::LocalHistoryUnavailable);
+        }
         Some(c)
     }
     pub fn displayed(&mut self, id: &str, context: &ContextRef) -> Result<(), Error> {
@@ -442,11 +461,39 @@ mod tests {
         let e = s.ledger.entry("1").unwrap();
         assert!(e.generated);
         assert!(!e.displayed);
-        assert_eq!(e.audibly_played_ms, 0);
+        assert!(e.audio.is_none());
         let mut other = c.context.clone();
         other.project_id = Some("B".into());
         assert_eq!(s.displayed("1", &other), Err(Error::Stale));
         s.displayed("1", &c.context).unwrap();
+    }
+    #[test]
+    fn failed_durable_admission_never_dispatches_provider_request() {
+        use std::os::unix::fs::PermissionsExt;
+        let path = std::env::temp_dir().join(format!(
+            "eva-dialogue-provider-{}",
+            crate::storage::random_id().unwrap()
+        ));
+        std::fs::create_dir(&path).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let m = Arc::new(Mock {
+            calls: AtomicUsize::new(0),
+            wait_cancel: false,
+            status: 200,
+        });
+        let mut service = Service::with_transport(cfg(), m.clone()).unwrap();
+        service.ledger = Ledger::open(&path, "eva", "boot").unwrap();
+        // The destination becomes unwritable after open, before admission.
+        std::fs::create_dir(path.join("dialogue-index.json")).unwrap();
+        assert_eq!(
+            service.start(turn("1"), "Eva", &[], BTreeSet::new()),
+            Err(Error::LocalHistoryUnavailable)
+        );
+        assert_eq!(m.calls.load(Ordering::SeqCst), 0);
+        assert!(service.active_turn().is_none());
+        assert!(service.ledger.entry("1").is_none());
+        assert!(service.ledger.journal_failed());
+        std::fs::remove_dir_all(path).unwrap();
     }
     #[test]
     fn mock_only_timeout_rate_limit_budget() {

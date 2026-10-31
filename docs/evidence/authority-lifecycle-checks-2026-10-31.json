@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Real private X11 compositor authority loss/restart, delayed presentation ordering, and complete supported native family matrix. Not full proposal, release, performance, continuous or physical scanout acceptance.",
+  "binaries_sha256": {
+    "jcompaniond": "2dfc4579360a9bcdc86ce7081ad7d8ae7e95be21bc418b855f16061364576de0",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "37dade5f9a41a3ab7370e4b92f6bf976f9406fdd8a92ca45f42786b0314b4fe9",
+    "frost": "0dc28fd93ecffd87aaf4b0dda33a813541a5f348fd24b947afc970f6cbd73af1",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "native_lifecycle": {
+    "ember": {
+      "passed": true,
+      "native_pixel_changes": 22532,
+      "kernel_wm_stop_observed": true,
+      "exact_old_token_held_without_new_scene_receipt": true,
+      "owner_xid_reused": true,
+      "shell_input_executed_before_loss": false,
+      "native_backing_samples": 2,
+      "root_samples": 12,
+      "report": "native-authority-ember-final-2026-10-31/lifecycle-report.json"
+    },
+    "frost": {
+      "passed": true,
+      "native_pixel_changes": 3588,
+      "kernel_wm_stop_observed": true,
+      "exact_old_token_held_without_new_scene_receipt": true,
+      "owner_xid_reused": true,
+      "shell_input_executed_before_loss": true,
+      "native_backing_samples": 3,
+      "root_samples": 17,
+      "report": "native-authority-frost-final-2026-10-31/lifecycle-report.json"
+    }
+  },
+  "coordinator": {
+    "workspace_tests": 77,
+    "strict_all_target_clippy": "passed",
+    "format": "passed",
+    "real_ipc_contracts": 5,
+    "process_faults": "passed",
+    "regression_before": "authority-lifecycle-checks-2026-10-31/delayed-presented-ipc-before.json",
+    "regression_after": "authority-lifecycle-checks-2026-10-31/ipc-contracts-after.json",
+    "finding": "A delayed Presented for the old possible body could overwrite Preparing with Active while retaining a target, causing durable journal validation to terminate the coordinator. Presented now requires Granted/Active; exact retirement is unchanged."
+  },
+  "production_receipt_tests": {
+    "ember": 6,
+    "frost": 8,
+    "strict_clippy": "both passed",
+    "format": "both passed"
+  },
+  "builds": "Both frontend builds and the coordinator locked/offline; recorded Rust/Cargo inputs unchanged.",
+  "historical_failures": [
+    {
+      "report": "native-authority-loss-before-fix-2026-10-31/lifecycle-report.json",
+      "raw_passed": false,
+      "finding": "Actual Ember input remained blocked after genuine compositor selection loss."
+    },
+    {
+      "report": "native-authority-frost-startup-attempt-2026-10-31/lifecycle-report.json",
+      "raw_passed": false,
+      "finding": "The replacement WM reclaimed focus during initial scan; target visibility assertion failed. Fixture now waits for real managed PIDs and places actual pointer/focus."
+    },
+    {
+      "report": "native-authority-ember-probe-attempt-2026-10-31/lifecycle-report.json",
+      "raw_passed": false,
+      "finding": "Input recovered but an added Vulkan evidence-log condition did not detect ordinary eframe drawing. Final fixture checks actual native backing pixels in both apps and additionally a new requested Vulkan completion in Frost."
+    },
+    {
+      "report": "native-matrix-authority-preparing-failure-2026-10-31/matrix-report.json",
+      "raw_passed": false,
+      "root_samples": 55,
+      "rapid_focus_events": 24,
+      "finding": "Complete native setup and forward visits succeeded; delayed Presented terminated daemon at Preparing. No full reverse traversal. Original report/log retained."
+    }
+  ],
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-authority-final-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "native_pid_markers": 72,
+    "host_identities_and_connections": 8,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "root_samples": 66,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 6,
+        "native_published": 6,
+        "scene_accepted": 6
+      },
+      "ember-2": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "frost-1": {
+        "vulkan_completed": 5,
+        "native_published": 5,
+        "scene_accepted": 5
+      },
+      "frost-2": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      }
+    }
+  },
+  "source_files_sha256": {
+    "jcompanion/crates/companion-core/src/lib.rs": "15757de8675e3ba978c293fb2593aebca059a38756e05c1d7acf49c9144fc085",
+    "jcompanion/tests/ipc_contracts.py": "c3ccf653799143a4d6163af80842223977ce7ee2e16911207a9c3bb53390f9da",
+    "jcompanion/tests/native_lifecycle.py": "831df30ddf7163c7f9832b426e87c2113af3976658804005a67c7501534a7a85",
+    "ember/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "4d5c1b71456d1d4f26e2e4dda87070f0d9a99e7e4fa9e09f9b6dc9178f892b44",
+    "ember/vendor/winit/src/platform_impl/linux/x11/xdisplay.rs": "52d57f52f5a3b04819d83205306ef66feda8a135971f0ba1b38023c5e9736770",
+    "ember/vendor/winit/src/platform_impl/linux/x11/event_processor.rs": "11ec1e63a315b92f48a9b2158cc98c1de21062522ddf4090d0b0e25ea539f63d",
+    "ember/vendor/winit/src/platform_impl/linux/x11/window.rs": "9a4a75cc0da34b0acd899e42dab1bb0b8132e47bd18a8a136f65977582f54bbd",
+    "frost/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "4d5c1b71456d1d4f26e2e4dda87070f0d9a99e7e4fa9e09f9b6dc9178f892b44",
+    "frost/vendor/winit/src/platform_impl/linux/x11/xdisplay.rs": "52d57f52f5a3b04819d83205306ef66feda8a135971f0ba1b38023c5e9736770",
+    "frost/vendor/winit/src/platform_impl/linux/x11/event_processor.rs": "11ec1e63a315b92f48a9b2158cc98c1de21062522ddf4090d0b0e25ea539f63d",
+    "frost/vendor/winit/src/platform_impl/linux/x11/window.rs": "9a4a75cc0da34b0acd899e42dab1bb0b8132e47bd18a8a136f65977582f54bbd"
+  },
+  "cleanup": {
+    "owned_runtime_roots": [
+      "/tmp/eva-native-g0oxnuh9",
+      "/tmp/eva-native-h3ed0khk",
+      "/tmp/eva-native-jlzef1f3",
+      "/tmp/eva-native-jntdcspm",
+      "/tmp/eva-native-cfv7ohzy",
+      "/tmp/eva-native-sbu038k3",
+      "/tmp/eva-native-xhxzsyx_",
+      "/tmp/eva-native-54xvsnqt",
+      "/tmp/eva-native-2iy2cgyn",
+      "/tmp/eva-native-c1h880go",
+      "/tmp/eva-native-kb9ehhzx",
+      "/tmp/eva-native-zd6g7kyt",
+      "/tmp/eva-native-rl907r8_"
+    ],
+    "remaining_processes": []
+  },
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-authority-37dade5-0dc28fd",
+  "remote_ci": "Not run; existing coordinator IPC CI includes the new case.",
+  "limits": [
+    "Default-Cat PNG classification is sampled, capture/journal are not atomic, zero matches do not prove absence.",
+    "NativePresented is not authenticated CompositorPresented; strict physical-proof mode remains unsupported.",
+    "Other backends/compositors/drivers, native close/crash/remap/resize/suspend matrices, IME/selection/scroll, actual voice/API, trusted single-node fences/anchors and release/performance remain pending.",
+    "The two earlier Ember UI baseline assertion failures remain recorded. No complete frontend or remote CI pass is claimed."
+  ]
+}

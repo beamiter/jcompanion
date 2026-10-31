@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Private Vulkan/JWM/X11 real late-foreground close intent, embedded Vim9, explicit final-tab confirmation and sampled full family matrix. The late job is launched by native shell input and takes actual kernel PTY foreground; it is not an ordinary shell fg UX test. No synthetic residence/native proof is injected.",
+  "implemented": [
+    "Ember separates an already-started withdrawal from GUI close permission: new terminal work pauses exit until a fresh close request, without cancelling or fabricating old-token proof.",
+    "Frost rechecks fresh kernel PTY foreground across owned interactive panes during guarded window withdrawal. New work pauses both automatic exit and the blocking closing overlay, preserving native input; fresh window close explicitly rearms.",
+    "The final pane retains its own explicit process-confirmation/completion path; Frost final-session exit clears the whole-window guard instead of blocking an already authorized close."
+  ],
+  "binary_sha256": {
+    "jcompaniond": "47c6be46af524adaca9e96d76953ca9cba31e78b73738a9be26bb9b979a2633f",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "4eb0a4f3b45b665dc9be2769efd60e6b289d60cd79a6a0d6249d3e8af45681c8",
+    "frost": "0f2118d0d0f38cb9710bdf6f373fd38b0137d0f7d706239331a2b6dea47227ab",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "close_intent_cases": {
+    "ember-embedded-editor-exit": {
+      "passed": true,
+      "report": "native-close-intent-ember-embedded-editor-exit-2026-10-31/close-intent-report.json",
+      "root_samples": 10,
+      "same_final_binary_reuse": true
+    },
+    "frost-late-job": {
+      "passed": true,
+      "report": "native-close-intent-frost-late-job-2026-10-31/close-intent-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false
+    },
+    "ember-late-job": {
+      "passed": true,
+      "report": "native-close-intent-ember-late-job-2026-10-31/close-intent-report.json",
+      "root_samples": 11,
+      "same_final_binary_reuse": false
+    },
+    "ember-embedded-save": {
+      "passed": true,
+      "report": "native-close-intent-ember-embedded-save-2026-10-31/close-intent-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false
+    },
+    "frost-late-final-tab": {
+      "passed": true,
+      "report": "native-close-intent-frost-late-final-tab-2026-10-31/close-intent-report.json",
+      "root_samples": 17,
+      "same_final_binary_reuse": false
+    }
+  },
+  "window_use_cases": {
+    "ember-busy": {
+      "passed": true,
+      "report": "native-close-intent-ember-busy-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-busy": {
+      "passed": true,
+      "report": "native-close-intent-frost-busy-2026-10-31/window-use-report.json",
+      "root_samples": 19,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-busy-background": {
+      "passed": true,
+      "report": "native-close-intent-frost-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 18,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-busy-background": {
+      "passed": true,
+      "report": "native-close-intent-ember-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-external-vim": {
+      "passed": true,
+      "report": "native-close-intent-frost-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 19,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-external-vim": {
+      "passed": true,
+      "report": "native-close-intent-ember-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-mapped-resize": {
+      "passed": true,
+      "report": "native-close-intent-frost-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 18,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": false
+    },
+    "ember-mapped-resize": {
+      "passed": true,
+      "report": "native-close-intent-ember-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": false
+    }
+  },
+  "surface_regression": {
+    "frost-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-frost-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 14
+    },
+    "ember-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-ember-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "frost-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-frost-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 17
+    },
+    "ember-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-ember-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "frost-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-frost-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 12
+    },
+    "ember-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-close-intent-ember-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 8
+    },
+    "frost-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-close-intent-frost-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 15
+    },
+    "ember-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-close-intent-ember-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 13
+    }
+  },
+  "authority_regression": {
+    "frost-authority": {
+      "passed": true,
+      "report": "native-close-intent-frost-authority-2026-10-31/lifecycle-report.json"
+    },
+    "ember-authority": {
+      "passed": true,
+      "report": "native-close-intent-ember-authority-2026-10-31/lifecycle-report.json"
+    }
+  },
+  "historical": [
+    {
+      "report": "native-close-ember-late-before-2026-10-31/close-intent-report.json",
+      "raw_passed": false,
+      "finding": "Old Ember completed actual native withdrawal and kept the new foreground job alive, then auto-closed the GUI when the fixture completed that work without a fresh close request."
+    },
+    {
+      "report": "native-close-frost-late-initial-before-2026-10-31/close-intent-report.json",
+      "raw_passed": false,
+      "finding": "Old Frost exited while new foreground work was live. Initial generic failure wording mentions after-work; no fixture completion event exists. The first signal handler could not retain a signal marker after TTY hangup; the repeated test below records it."
+    },
+    {
+      "report": "native-close-frost-late-signal-before-2026-10-31/close-intent-report.json",
+      "raw_passed": false,
+      "finding": "Old Frost terminated the actual new foreground job after native retirement; the corrected first-signal recorder observed SIGHUP before any fixture completion."
+    },
+    {
+      "report": "native-close-embedded-save-initial-2026-10-31/close-intent-report.json",
+      "raw_passed": true,
+      "finding": "The existing embedded Vim9 modified-buffer/save/deferred-window-close flow passed on the preceding Ember binary; final acceptance was repeated with current binary."
+    },
+    {
+      "report": "native-close-ember-late-initial-after-2026-10-31/close-intent-report.json",
+      "raw_passed": true,
+      "finding": "Initial fix passed the first late-work/fresh-close scenario. The stronger final test additionally repeats a refused close and verifies native terminal input after work ends."
+    },
+    {
+      "report": "native-close-frost-late-initial-after-2026-10-31/close-intent-report.json",
+      "raw_passed": true,
+      "finding": "Initial Frost fix passed; final acceptance additionally checks repeated close and native terminal input."
+    }
+  ],
+  "targeted_tests": {
+    "ember_eva": 2,
+    "ember_window": 5,
+    "frost_eva": 11,
+    "frost_close": 68
+  },
+  "unchanged_checks_reused": {
+    "schema": 1,
+    "scope": "Unchanged exact coordinator binary/compile inputs, JWM source tree, receipt harness inputs and egui-winit key source. Reuse is explicit; these suites were not rerun this turn.",
+    "passed": true,
+    "coordinator_compile_inputs": 28,
+    "coordinator_binary_sha256": "47c6be46af524adaca9e96d76953ca9cba31e78b73738a9be26bb9b979a2633f",
+    "coordinator_workspace_tests_reused": 77,
+    "real_ipc_contracts_reused": 7,
+    "jwm_files_verified": 1809,
+    "receipt_harness_reused": {
+      "ember": 7,
+      "frost": 9
+    },
+    "egui_winit_tests_reused": 8,
+    "egui_winit_source_sha256": "0d2d0c3a7a2431b42a88b7de62d6a61d0195c1ff9661c040ca016cea24b04646",
+    "previous_evidence": "window-use-checks-2026-10-31.json"
+  },
+  "frontend_builds": "Both final locked/offline builds passed; recorded Rust/Cargo input hashes unchanged during builds and at evidence collection. The two existing iced_winit deprecation warnings remain; full frontend Clippy is not claimed.",
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-close-intent-final-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "native_pid_markers": 72,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "root_samples": 77,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "ember-2": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "frost-1": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      },
+      "frost-2": {
+        "vulkan_completed": 5,
+        "native_published": 5,
+        "scene_accepted": 5
+      }
+    }
+  },
+  "cleanup": {
+    "owned_runtime_roots": [
+      "/tmp/eva-native-0_i0mz1u",
+      "/tmp/eva-native-1wtxqrq9",
+      "/tmp/eva-native-4e0c4ds1",
+      "/tmp/eva-native-55fu_r3_",
+      "/tmp/eva-native-6irqxw9c",
+      "/tmp/eva-native-7jn4x0k1",
+      "/tmp/eva-native-_8o42981",
+      "/tmp/eva-native-_g619mn7",
+      "/tmp/eva-native-_redo3a9",
+      "/tmp/eva-native-_zea2dw7",
+      "/tmp/eva-native-aw6qfk2q",
+      "/tmp/eva-native-b6h3j1jo",
+      "/tmp/eva-native-br0is9ox",
+      "/tmp/eva-native-df5ba_sa",
+      "/tmp/eva-native-e0hi4wwp",
+      "/tmp/eva-native-fuuaq2bw",
+      "/tmp/eva-native-g90bgsf6",
+      "/tmp/eva-native-guhs3v04",
+      "/tmp/eva-native-h6fgx9a5",
+      "/tmp/eva-native-lhzbb9ls",
+      "/tmp/eva-native-lsqko8k1",
+      "/tmp/eva-native-qq8rqycg",
+      "/tmp/eva-native-qy0j4erz",
+      "/tmp/eva-native-rdhqkykg",
+      "/tmp/eva-native-rfn2bzwh",
+      "/tmp/eva-native-svrp18vc",
+      "/tmp/eva-native-wv46u88r",
+      "/tmp/eva-native-x7ves0ut",
+      "/tmp/eva-native-xpu824no",
+      "/tmp/eva-native-yahnfujp"
+    ],
+    "remaining_processes": []
+  },
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-close-intent-4eb0a4f-0f2118d",
+  "source_files_sha256": {
+    "jcompanion/tests/native_close_intent.py": "0f68cac905b0ef2a6ecd52bdc9e6952a442d40530e0f197abe42349ffe9cf797",
+    "ember/src/app/window.rs": "b05fda0be4914a7bd407f6feb717bf6dea1bd94c98a48ad7827d5aa7e494b19b",
+    "ember/src/eva_companion.rs": "fbb923545b341fb5e127e7347eadafedb0cdbaab9045e02c395a04f9464f0c88",
+    "frost/src/main.rs": "d4265445fab3bc1485c83c8cf1d4ae27ea66411f9b4e3cbe24fb9705552b6e7b",
+    "frost/src/eva_companion.rs": "fdae0285d89c1532ea74ba928b43ff7d998725438994205bf7c8a9938f498590"
+  },
+  "remote_ci": "Not run; native tests are local isolated acceptance.",
+  "limits": [
+    "A paused close keeps its already-started withdrawal intact. Restoring admission/body to that same kept-open window through a cancel-withdrawal handshake is not implemented.",
+    "The native late-work cases use a distinct foreground process group under an interactive shell. Active command-owned/Agent CLI and directly launched child programs, and remote sessions, still need separate role-aware close acceptance.",
+    "Embedded Vim9 tests exercise Ember real modified buffers, native save and both deferred whole-window close and editor-only exit. Other frontends embedded-editor flows, dirty cancellation UI and same-process native windows remain pending.",
+    "SIGKILL remains recovery_blocked without trusted destruction proof. No automatic crash recovery, CompositorPresented, physical/continuous uniqueness or performance claim is made.",
+    "Other drivers/backends, suspend/resume, IME/selection/scroll, voice/API, trusted single-node fences/anchors and full release/performance remain open; the two known Ember UI baseline failures remain recorded."
+  ]
+}

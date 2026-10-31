@@ -29,6 +29,53 @@ pub struct Host {
     pub surface_id: String,
     pub retirement: RetirementCapability,
 }
+/// Features are negotiated only through the opt-in extended host handshake.
+/// Legacy Hello/Accepted frames retain their exact schema and semantics.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum HostFeature {
+    WithdrawalResumeV1,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
+pub enum HostMetadata {
+    Focus {
+        focused: bool,
+    },
+    Input {
+        active: bool,
+        selecting: bool,
+    },
+    Geometry {
+        revision: u64,
+        viewport: Rect,
+        candidates: Vec<Rect>,
+        exclusions: Vec<Rect>,
+    },
+    ContextObserved {
+        context: ContextRef,
+    },
+}
+impl HostMetadata {
+    pub fn into_request(self) -> Request {
+        match self {
+            Self::Focus { focused } => Request::Focus { focused },
+            Self::Input { active, selecting } => Request::Input { active, selecting },
+            Self::Geometry {
+                revision,
+                viewport,
+                candidates,
+                exclusions,
+            } => Request::Geometry {
+                revision,
+                viewport,
+                candidates,
+                exclusions,
+            },
+            Self::ContextObserved { context } => Request::ContextObserved { context },
+        }
+    }
+}
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Presence {
@@ -191,6 +238,23 @@ pub enum Request {
         digest: String,
     },
     Withdraw,
+    WithdrawIntent {
+        connection_nonce: String,
+        intent: u64,
+        previous_token: Option<Token>,
+    },
+    ResumeWithdrawal {
+        connection_nonce: String,
+        intent: u64,
+    },
+    ActivateHost {
+        connection_nonce: String,
+    },
+    HostMetadata {
+        connection_nonce: String,
+        admission_epoch: u64,
+        metadata: HostMetadata,
+    },
     DesktopHello,
     VoiceContext {
         session_id: String,
@@ -283,6 +347,10 @@ pub enum Request {
     Hello {
         host: Host,
     },
+    HelloWithFeatures {
+        host: Host,
+        features: Vec<HostFeature>,
+    },
     CompositorHello {
         host: Host,
     },
@@ -318,6 +386,37 @@ pub enum Request {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Reply {
+    HostAccepted {
+        boot_id: String,
+        companion_id: String,
+        session_id: String,
+        features: Vec<HostFeature>,
+        connection_nonce: String,
+    },
+    HostActivated {
+        connection_nonce: String,
+        host_id: String,
+        incarnation: u64,
+        surface_id: String,
+        admission_epoch: u64,
+    },
+    WithdrawalReady {
+        connection_nonce: String,
+        host_id: String,
+        incarnation: u64,
+        surface_id: String,
+        intent: u64,
+        retired_token: Option<Token>,
+    },
+    WithdrawalResumed {
+        connection_nonce: String,
+        admission_epoch: u64,
+        host_id: String,
+        incarnation: u64,
+        surface_id: String,
+        intent: u64,
+        retired_token: Option<Token>,
+    },
     MemoryScopes {
         scopes: Vec<MemoryScope>,
         next_after: Option<String>,
@@ -468,6 +567,14 @@ pub fn identifier(s: &str) -> bool {
         && s.bytes()
             .all(|b| b.is_ascii_alphanumeric() || b"_-.:".contains(&b))
 }
+pub fn valid_token(token: &Token) -> bool {
+    identifier(&token.companion_id)
+        && identifier(&token.host_id)
+        && identifier(&token.boot_id)
+        && identifier(&token.surface_id)
+        && token.incarnation > 0
+        && token.epoch > 0
+}
 pub fn decode(bytes: &[u8]) -> Result<Envelope, String> {
     if bytes.len() > MAX_FRAME {
         return Err("frame_limit".into());
@@ -495,6 +602,57 @@ pub fn decode(bytes: &[u8]) -> Result<Envelope, String> {
         return Err("invalid_envelope".into());
     }
     match &e.body {
+        Request::WithdrawIntent {
+            intent,
+            previous_token,
+            ..
+        } if *intent == 0
+            || *intent >= u64::MAX - 1024
+            || previous_token.as_ref().is_some_and(|t| !valid_token(t)) =>
+        {
+            return Err("invalid_withdrawal_intent".into())
+        }
+        Request::ResumeWithdrawal { intent, .. } if *intent == 0 || *intent >= u64::MAX - 1024 => {
+            return Err("invalid_withdrawal_intent".into())
+        }
+        Request::ActivateHost { connection_nonce }
+        | Request::WithdrawIntent {
+            connection_nonce, ..
+        }
+        | Request::ResumeWithdrawal {
+            connection_nonce, ..
+        }
+        | Request::HostMetadata {
+            connection_nonce, ..
+        } if !identifier(connection_nonce) => return Err("invalid_connection_nonce".into()),
+        Request::HostMetadata {
+            admission_epoch,
+            metadata,
+            ..
+        } if *admission_epoch == 0
+            || match metadata {
+                HostMetadata::Geometry {
+                    viewport,
+                    candidates,
+                    exclusions,
+                    ..
+                } => {
+                    !viewport.valid()
+                        || candidates.len() > MAX_REGIONS
+                        || exclusions.len() > MAX_REGIONS
+                        || candidates.iter().chain(exclusions).any(|r| !r.valid())
+                }
+                HostMetadata::ContextObserved { context } => !valid_context(context),
+                _ => false,
+            } =>
+        {
+            return Err("invalid_host_metadata".into())
+        }
+        Request::HelloWithFeatures { features, .. }
+            if features.as_slice() != [HostFeature::WithdrawalResumeV1] =>
+        {
+            return Err("invalid_host_features".into())
+        }
         Request::MemoryScopes { after: Some(after) }
             if !(after == "global"
                 || after
@@ -634,7 +792,9 @@ pub fn decode(bytes: &[u8]) -> Result<Envelope, String> {
         {
             return Err("invalid_turn".into())
         }
-        Request::Hello { host } | Request::CompositorHello { host }
+        Request::Hello { host }
+        | Request::CompositorHello { host }
+        | Request::HelloWithFeatures { host, .. }
             if host.id != e.source_id
                 || !identifier(&host.id)
                 || !identifier(&host.surface_id)
@@ -696,5 +856,81 @@ mod tests {
         )
         .is_err());
         assert!(decode(&vec![b' '; MAX_FRAME + 1]).is_err());
+    }
+}
+
+#[cfg(test)]
+mod host_feature_tests {
+    use super::*;
+    fn wire(body: serde_json::Value) -> Vec<u8> {
+        serde_json::to_vec(&serde_json::json!({"protocol_version":1,"event_id":"e","source_id":"h","source_seq":1,"boot_id":"boot","session_id":"session","body":body})).unwrap()
+    }
+    fn host() -> serde_json::Value {
+        serde_json::json!({"id":"h","incarnation":1,"surface_id":"s","retirement":"native_presented"})
+    }
+    #[test]
+    fn extended_host_handshake_is_opt_in_and_strictly_bounded() {
+        assert!(decode(&wire(serde_json::json!({"type":"hello","host":host()}))).is_ok());
+        assert!(decode(&wire(serde_json::json!({"type":"hello_with_features","host":host(),"features":["withdrawal_resume_v1"]}))).is_ok());
+        for features in [
+            serde_json::json!([]),
+            serde_json::json!(["withdrawal_resume_v1", "withdrawal_resume_v1"]),
+            serde_json::json!(["unknown"]),
+        ] {
+            assert!(decode(&wire(
+                serde_json::json!({"type":"hello_with_features","host":host(),"features":features})
+            ))
+            .is_err());
+        }
+        let mut other = host();
+        other["id"] = "other".into();
+        assert!(decode(&wire(serde_json::json!({"type":"hello_with_features","host":other,"features":["withdrawal_resume_v1"]}))).is_err());
+        assert!(decode(&wire(
+            serde_json::json!({"type":"hello","host":host(),"features":[]})
+        ))
+        .is_err());
+    }
+    #[test]
+    fn connection_and_intent_fields_cannot_be_omitted_zero_or_exhausted() {
+        for kind in ["withdraw_intent", "resume_withdrawal"] {
+            for intent in [0, u64::MAX] {
+                let mut body =
+                    serde_json::json!({"type":kind,"connection_nonce":"n","intent":intent});
+                if kind == "withdraw_intent" {
+                    body["previous_token"] = serde_json::Value::Null;
+                }
+                assert!(decode(&wire(body)).is_err());
+            }
+        }
+        assert!(decode(&wire(
+            serde_json::json!({"type":"resume_withdrawal","connection_nonce":"n","intent":1})
+        ))
+        .is_ok());
+        assert!(decode(&wire(
+            serde_json::json!({"type":"resume_withdrawal","intent":1})
+        ))
+        .is_err());
+        assert!(decode(&wire(
+            serde_json::json!({"type":"activate_host","connection_nonce":"x".repeat(129)})
+        ))
+        .is_err());
+    }
+    #[test]
+    fn admission_metadata_rejects_bad_epochs_geometry_and_context() {
+        let mut body = serde_json::json!({"type":"host_metadata","connection_nonce":"n","admission_epoch":1,"metadata":{"type":"focus","focused":true}});
+        assert!(decode(&wire(body.clone())).is_ok());
+        body["admission_epoch"] = 0.into();
+        assert!(decode(&wire(body.clone())).is_err());
+        body["admission_epoch"] = 1.into();
+        body["metadata"] = serde_json::json!({"type":"geometry","revision":1,"viewport":{"x":0.,"y":0.,"width":-1.,"height":1.},"candidates":[],"exclusions":[]});
+        assert!(decode(&wire(body.clone())).is_err());
+        body["metadata"] = serde_json::json!({"type":"context_observed","context":{"host_id":"","pane_id":"p","task_id":null,"project_id":null,"revision":1}});
+        assert!(decode(&wire(body.clone())).is_err());
+        body["metadata"] =
+            serde_json::json!({"type":"resume_withdrawal","intent":1,"connection_nonce":"n"});
+        assert!(
+            decode(&wire(body)).is_err(),
+            "metadata cannot wrap ordered control or another scope"
+        );
     }
 }

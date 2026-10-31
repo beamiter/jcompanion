@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "scope": "Offline workspace contracts and lint, not native/device/API acceptance",
+  "checks": [
+    {
+      "name": "workspace-tests",
+      "exit_code": 0,
+      "log": "workspace-tests-2026-10-30.txt",
+      "sha256": "759fcd03d3a67d5012657ad599e431a4f56e3f40aafdc0b42e70cb53baf40e27",
+      "passed": 76
+    },
+    {
+      "name": "workspace-clippy",
+      "exit_code": 0,
+      "log": "workspace-clippy-2026-10-30.txt",
+      "sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc"
+    }
+  ]
+}

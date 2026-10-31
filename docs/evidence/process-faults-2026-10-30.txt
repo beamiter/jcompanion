@@ -1,0 +1,6 @@
+Observed command: env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/fault_processes.py target/debug/jcompaniond
+Execution: outside AF_UNIX-restricted sandbox; real daemon and synthetic protocol hosts, no native pixel/device/API proof.
+Binary SHA-256: 5797ac91cccfdeb81f1aba495c1898f7525075e80326f84ab2df31216f9282ae
+Exit code: 0
+Observed stdout:
+PASS: real IPC, exclusive lock, SIGSTOP block, exact retirement, daemon SIGKILL recovery, stale-proof rejection, disconnect fail-closed

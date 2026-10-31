@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "goal_complete": false,
+  "scope": "Actual eight-GUI, 32-PTY native matrix. Setup/routing and a focused fairness fix are verified; body uniqueness acceptance is failed.",
+  "source_base_commits": {
+    "jcompanion": "9aa569540091524d637a7115b64c587b9177a55b",
+    "jwm": "982152b6ca40781a88478a789b45432a30660a26",
+    "ember": "c21dbf62d908ba869a97b9d1d4beace7faefc7bf",
+    "anvil": "d76a33a300d10055fa89d370335c43fb2b03c729",
+    "forge": "58495ae55fafbd30c5998d936e5014aef8671910",
+    "frost": "cdaa2a966de6c8cf8bfd90809397b8660b7f6ed6"
+  },
+  "jwm_current_binary_sha256": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+  "jwm_compositor_tests": {
+    "passed": 298,
+    "failed": 0,
+    "ignored": 0,
+    "log": "matrix-checks-2026-10-31/jwm-tests.txt"
+  },
+  "jwm_clippy": "passed, strict all-target backend-x11rb",
+  "jwm_xcb": "compilation passed; native XCB not run",
+  "jwm_format": "modified Rust files passed",
+  "native_setup": {
+    "gui_processes": 8,
+    "shell_ptys": 32,
+    "gui_input_pid_markers": 72,
+    "verified": true,
+    "criteria": "four distinct PTY session leaders per GUI; actual native input and spatial keys write each shell PID; kernel raw-mode observation for jsh readiness"
+  },
+  "native_components": "Default-Cat spatial components additionally detect separated bodies within one window; validated against 35 earlier retained native frames, all expected counts matched. Other skins/Compact and continuous/physical proofs remain outside scope.",
+  "before_fairness": {
+    "passed": false,
+    "error": "native matrix handoff failed at forge-2",
+    "report": "native-matrix-before-fairness-2026-10-31/matrix-report.json",
+    "finding": "old Forge body remained visible, retirement stayed blocked after resume"
+  },
+  "after_fairness": {
+    "passed": false,
+    "error": "sample contains body pixels in multiple native windows",
+    "report": "native-matrix-after-fairness-2026-10-31/matrix-report.json",
+    "body_hosts_observed": 5,
+    "finding": "previous Forge/Anvil handoffs advanced; a single root PNG then shows two actual Ember bodies",
+    "dual_body_png": "native-matrix-after-fairness-2026-10-31/023-waiting-ember-2.png",
+    "dual_body_png_sha256": "c5d335fde94f84ec4038069e4ffa2dc155b02b53749f39a8e6adcd7738bc4128",
+    "next_png_old_body_cleared": "native-matrix-after-fairness-2026-10-31/024-failed-matrix.png",
+    "native_resume": {
+      "pid": 275002,
+      "state": "State:\tR (running)",
+      "elapsed_ms": 119306.55
+    },
+    "rapid_burst_executed": false
+  },
+  "follow_up": "Bind X11 WGPU/iced retirement to the compositor-observed actual cleared frame; native queue/present submission alone is insufficient for the required visible-body invariant. Keep the full matrix gate failed.",
+  "changes_uncommitted": true,
+  "source_files_sha256": {
+    "jwm/src/backend/x11/compositor/frame_sync.rs": "e79f48c31b4d3b60b2052cf64d30e2fac76e5090f906b870fdfbb941c73be31f",
+    "jwm/src/backend/x11/compositor/render.rs": "c7c8a1601486f983e2a4525fd171bd080012d2a71929f25a14e100e058d04a3b",
+    "jwm/src/backend/x11/compositor/mod.rs": "049b11b5a22e436e8e0a7c8a00024a8291b1f59403275453bba9f21b9a14ac10",
+    "jwm/src/backend/x11/compositor/init.rs": "1c37b385f47b43674de7a2a2bb04724a061657bf881f939a92d2e2127ea0064a",
+    "jcompanion/tests/native_matrix.py": "65599b71d71294bcf418dcf67dffe1c15064611fcf415e1a59a98a5095bb11b9",
+    "jcompanion/tests/native_windows.py": "5737552f94f9ef463a82f3cd828393d2ae87d4930f51cfeb959efd73ea3986c7"
+  },
+  "native_process_cleanup": "Verified no remaining processes with the six owned diagnostic/matrix XDG runtime directories."
+}

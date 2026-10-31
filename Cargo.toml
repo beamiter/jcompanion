@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/companion-protocol", "crates/companion-core", "crates/companion-client", "daemon", "crates/companion-memory", "crates/companion-openai", "crates/eva-character-atlas"]
+members = ["crates/companion-protocol", "crates/companion-core", "crates/companion-client", "crates/companion-host", "crates/companion-voice", "daemon", "crates/companion-memory", "crates/companion-openai", "crates/eva-character-atlas"]
 [workspace.package]
 edition = "2021"
 license = "MIT"

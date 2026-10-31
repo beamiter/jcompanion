@@ -1,0 +1,274 @@
+   Compiling companion-protocol v0.1.0 (/home/yj/projects/jcompanion/crates/companion-protocol)
+   Compiling companion-client v0.1.0 (/home/yj/projects/jcompanion/crates/companion-client)
+   Compiling companion-core v0.1.0 (/home/yj/projects/jcompanion/crates/companion-core)
+   Compiling companion-openai v0.1.0 (/home/yj/projects/jcompanion/crates/companion-openai)
+   Compiling companion-voice v0.1.0 (/home/yj/projects/jcompanion/crates/companion-voice)
+   Compiling companion-host v0.1.0 (/home/yj/projects/jcompanion/crates/companion-host)
+   Compiling jcompaniond v0.1.0 (/home/yj/projects/jcompanion/daemon)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.54s
+     Running unittests src/lib.rs (target/debug/deps/companion_client-3331c56e4e600b5f)
+
+running 4 tests
+test eof_tests::complete_final_frame_survives_eof ... ok
+test tests::framed_roundtrip ... ok
+test tests::backpressure_preserves_control ... ok
+test handshake_tests::early_controls_wait_for_accepted_boot ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_core-707eac0006259b0a)
+
+running 20 tests
+test behavior::activity_tests::movement_and_content_cues_are_bounded ... ok
+test behavior::activity_tests::new_task_success_restarts_brief_fact_pose ... ok
+test behavior::tests::hard_priority ... ok
+test behavior::activity_tests::recent_activity_does_not_curl_after_daemon_uptime ... ok
+test fault_traces::compositor_policy_cannot_accept_native_proof ... ok
+test fault_traces::counter_and_inconsistent_journal_fail_closed ... ok
+test behavior::tests::deterministic_trace ... ok
+test recall_and_retirement_tests::hidden_recall_waits_exact_proof_then_prepares ... ok
+test geometry::tests::input_protected ... ok
+test recall_and_retirement_tests::lost_retirement_ack_is_idempotent_across_restart ... ok
+test recall_and_retirement_tests::scene_hide_recall_and_lock_keep_one_same_token ... ok
+test recall_and_retirement_tests::locked_recall_never_unhides_lock_or_overrides_proof ... ok
+test tests::delayed_presented_cannot_overwrite_a_new_target_preparation ... ok
+test scene_tests::unproven_scene_bootstrap_never_proves_removal ... ok
+test tests::old_callbacks_rejected ... ok
+test tests::hidden_revokes_not_forgets ... ok
+test tests::stopped_disconnected_or_restarted_owner_never_expires ... ok
+test tests::target_disconnect_does_not_grant ... ok
+test tests::transfer_requires_exact_proof ... ok
+test fault_traces::virtual_clock_adversarial_transitions_preserve_journal ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_host-d7cdfac7db712cd1)
+
+running 41 tests
+test cancel_key_tests::repeat_and_release_stay_owned_after_the_dialog_is_gone ... ok
+test cancel_key_tests::both_blur_release_orders_require_a_focused_release_before_terminal_escape ... ok
+test cancel_key_tests::work_owned_escape_passes_and_an_old_hold_cannot_cancel_a_new_intent ... ok
+test dialogue_save::tests::changed_context_and_archived_scope_are_not_silent_destinations ... ok
+test dialogue_save::tests::incomplete_and_unrelated_replies_cannot_be_saved ... ok
+test dialogue_save::tests::exact_exchange_uses_existing_review_without_overwrite_or_selection_capture ... ok
+test dialogue_save::tests::new_turn_and_disconnect_discard_the_previous_capture ... ok
+test modern_admission_tests::cancel_keeps_exact_proof_and_requires_bound_resume_ack_before_new_grant ... ok
+test dialogue_save::tests::oversized_unicode_exchange_is_rejected_without_truncation ... ok
+test modern_admission_tests::duplicate_revoke_preserves_an_inflight_native_clearance_and_submitted_proof ... ok
+test modern_admission_tests::connection_loss_never_erases_a_possible_body ... ok
+test modern_admission_tests::idle_withdrawal_ack_cannot_skip_an_existing_surface_obligation ... ok
+test modern_admission_tests::fresh_close_while_resume_is_in_flight_gets_a_new_intent_and_no_auto_exit ... ok
+test modern_admission_tests::initial_admission_requires_capability_and_activation_ack ... ok
+test modern_admission_tests::latest_cancel_cancels_a_queued_reclose_without_discarding_retirement ... ok
+test modern_admission_tests::new_connection_requires_fresh_native_boundary_for_the_same_old_token ... ok
+test modern_admission_tests::reconnect_preserves_cancel_and_old_token_but_rebinds_all_control_nonces ... ok
+test pty_session::linux::tests::stat_parser_uses_last_parenthesis_and_rejects_truncation ... ok
+test queued_grant_tests::an_already_queued_new_grant_changes_the_required_token_without_accepting_old_proof ... ok
+test tests::disconnect_never_falls_back ... ok
+test tests::completed_retirement_allows_later_prepare_not_old_callbacks ... ok
+test tests::duplicate_old_grant_cannot_resurrect_retired_body ... ok
+test tests::grant_receipt_is_not_actual_presentation ... ok
+test tests::no_presentation_capability_never_proves_retirement ... ok
+test tests::healthy_close_waits_for_exact_durable_retirement_ack ... ok
+test tests::metadata_coalesces_without_dropping_ordered_controls ... ok
+test tests::operation_error_does_not_disconnect_or_hide_body ... ok
+test tests::persisted_scope_discovery_is_bounded_and_preserves_review_origin ... ok
+test shell_identity::tests::missing_identity_or_wrong_start_never_proves_a_shell ... ok
+test tests::revoked_pixels_need_later_real_frame ... ok
+test tests::wrong_incarnation_and_surface_do_not_grant ... ok
+test tests::withdrawal_ack_is_host_bound_and_new_grant_invalidates_it ... ok
+test tests::reconnect_retires_old_boot_without_reviving_body ... ok
+test tests::rejection_reconnects_and_preserves_retirement_obligation ... ok
+test tests::stale_callbacks_and_grants_rejected ... ok
+test tests::restored_pane_counter_cannot_alias_an_earlier_window_task ... ok
+test shell_identity::tests::path_replacement_and_spoofed_basename_do_not_authorize_another_program ... ok
+test pty_session::linux::tests::malformed_oversized_and_unreadable_records_do_not_prove_idle ... ok
+test shell_identity::tests::actual_exec_changes_program_without_changing_child_incarnation ... ok
+test pty_session::linux::tests::idle_identity_mismatch_and_completed_child_are_distinct ... ok
+test pty_session::linux::tests::live_background_group_blocks_and_natural_exit_drains_only_owned_session ... ok
+
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_memory-5c5065410df24263)
+
+running 12 tests
+test tests::db_failure_never_commits ... ok
+test tests::management_scope_discovery_is_bounded_paginated_and_paused_safe ... ok
+test tests::delete_clears_derived ... ok
+test tests::expired_hidden_and_pause_retrieval ... ok
+test tests::proposals_are_not_memory ... ok
+test tests::protocol_style_opaque_ids_are_preserved ... ok
+test tests::stale_and_cross_store_approval_rejected ... ok
+test tests::edits_require_matching_revision ... ok
+test tests::exact_scope_isolation ... ok
+test tests::literal_search_is_scoped_and_bounded ... ok
+test tests::paging_includes_all_records_and_expired_management ... ok
+test tests::persistent_reopen_and_cross_connection_conflicts ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_openai-361cf99a49869396)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/adapter.rs (target/debug/deps/adapter-0378d1f1de0daf1c)
+
+running 9 tests
+test accounting_is_reported_not_guessed ... ok
+test destination_and_model_explicit ... ok
+test config_unknown_duplicate_missing_rejected ... ok
+test correct_responses_shape_not_chat ... ok
+test frozen_fixture_validates ... ok
+test plain_mode_never_extracts_suggestions ... ok
+test duplicate_unknown_missing_enum_target_rejected ... ok
+test evidence_user_role_exact_scope_and_bounds ... ok
+test faults_fail_closed ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_protocol-dcd71c751917b033)
+
+running 5 tests
+test strict_json::tests::nested_duplicates_rejected ... ok
+test tests::reject_unknown_duplicate_and_oversize ... ok
+test host_feature_tests::connection_and_intent_fields_cannot_be_omitted_zero_or_exhausted ... ok
+test host_feature_tests::admission_metadata_rejects_bad_epochs_geometry_and_context ... ok
+test host_feature_tests::extended_host_handshake_is_opt_in_and_strictly_bounded ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/companion_voice-73c1c21937a415c3)
+
+running 7 tests
+test tests::age_includes_sleep_and_rejects_missing_future_and_overflow ... ok
+test tests::capability_is_explicit_and_legacy_remains_unclocked ... ok
+test tests::negotiated_acceptance_round_trips_its_explicit_tag ... ok
+test tests::dialogue_requires_explicit_version_and_canonical_envelope ... ok
+test tests::clock_only_acceptance_cannot_enable_dialogue_records ... ok
+test tests::old_acceptance_cannot_negotiate_clocked_audio ... ok
+test tests::canonical_header_and_audio_validation_still_apply ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/eva_character_atlas-27ea68f3bf23a43c)
+
+running 10 tests
+test tests::aliases_and_unknown_rejected ... ok
+test tests::exact_original_golden ... ok
+test tests::bounded_one_shots_and_no_catchup ... ok
+test tests::templates_fit_ascii_and_have_one_face ... ok
+test tests::every_skin_has_distinct_full_body_pose_silhouettes ... ok
+test tests::static_is_time_and_seed_independent_except_star_palette_pattern ... ok
+test tests::hidden_and_reduced_have_no_callbacks ... ok
+test tests::deterministic_replay ... ok
+test tests::stardust_never_splits ... ok
+test tests::all_skins_poses_modes_frames ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.88s
+
+     Running unittests src/main.rs (target/debug/deps/jcompaniond-b75342e0a2af38a1)
+
+running 51 tests
+test dialogue::tests::both_routes_share_admission_and_only_matching_release_frees_it ... ok
+test dialogue::tests::interruption_preserves_only_confirmed_samples_and_closes_turn ... ok
+test dialogue::tests::diagnostic_record_is_metadata_only_and_does_not_invent_duration ... ok
+test dialogue::tests::drained_position_is_a_fact_without_ongoing_speaking ... ok
+test dialogue::tests::generated_or_unknown_clock_never_proves_speaking ... ok
+test dialogue::tests::invalid_frames_do_not_mutate_or_close_the_current_turn ... ok
+test dialogue::tests::lost_observation_keeps_a_lower_bound_and_refuses_old_replay ... ok
+test dialogue::tests::next_turn_closes_previous_without_inventing_success_or_interrupt ... ok
+test dialogue::tests::old_future_or_reordered_packets_cannot_refresh_a_turn ... ok
+test dialogue::tests::text_and_voice_names_have_separate_origins ... ok
+test dialogue::tests::text_generation_and_display_do_not_become_audio ... ok
+test dialogue::tests::source_and_activation_binding_survive_release_and_new_lease ... ok
+test dialogue::tests::stale_observation_hides_pose_without_finishing_or_releasing_the_turn ... ok
+test dialogue::tests::text_receipt_keeps_original_context ... ok
+test dialogue_events::tests::completed_call_references_and_unknown_refinement_are_required ... ok
+test dialogue_events::tests::contradictory_discovery_and_out_of_order_events_are_rejected ... ok
+test dialogue_events::tests::new_field_or_plain_text_cannot_enter_the_reference_schema ... ok
+test dialogue_events::tests::incomplete_or_missing_response_never_becomes_a_tool_call ... ok
+test peer_backpressure_tests::one_hundred_twenty_nine_replies_isolate_only_slow_peer ... ok
+test providers::privacy_tests::disabled_and_cross_scope_input_never_reaches_transport ... ok
+test host_admission::tests::live_body_blocks_resume_until_exact_actual_retirement_transition ... ok
+test host_admission::tests::stale_cancel_and_reused_intent_cannot_cancel_new_work_or_reset_metadata ... ok
+test dialogue_events::tests::operation_receipts_require_original_registration_and_terminal_facts_are_immutable ... ok
+test storage::tests::corrupt_journal_never_resets ... ok
+test host_admission::tests::activation_barrier_nonce_and_metadata_epoch_are_explicit ... ok
+test providers::tests::mock_only_completed_is_not_displayed_or_heard ... ok
+test memory_gateway::archived_scope_tests::archived_management_grant_never_becomes_model_scope ... ok
+test storage::tests::storage_failure_and_invariant_rejection ... ok
+test task_facts::tests::late_background_receipt_never_changes_current_task ... ok
+test providers::tests::mock_only_zero_idle_one_inflight_cancel_no_replay ... ok
+test task_facts::tests::revision_high_water_survives_other_task_observations ... ok
+test memory_gateway::archived_scope_tests::pure_project_discovery_does_not_grant_content_or_model_access ... ok
+test memory_gateway::tests::review_is_connection_and_context_bound ... ok
+test providers::tests::failed_durable_admission_never_dispatches_provider_request ... ok
+test dialogue::tests::capacity_failure_keeps_current_evidence_and_all_replay_tombstones ... ok
+test host_admission::tests::compacted_retirement_records_reconnect_without_clearing_a_current_body ... ok
+test dialogue::voice_event_tests::failed_reference_persistence_disables_admission_but_does_not_block_release ... ok
+test storage::tests::durable_identity_and_exclusive_profile ... ok
+test dialogue_store::tests::corrupt_public_or_foreign_profile_index_is_not_reset ... ok
+test task_facts::tests::capacity_rejects_new_facts_without_losing_existing_receipts ... ok
+test dialogue_store::tests::close_commits_last_real_played_count_and_new_boot_has_no_replay_authority ... ok
+test dialogue_store::tests::result_reference_keeps_source_project_and_rejects_old_receipts ... ok
+test dialogue_store::tests::restart_never_restores_active_audio_or_promotes_uncommitted_playback ... ok
+test task_authority::tests::collision_rejected_until_explicit_shared_review_and_persists ... ok
+test dialogue_store::tests::failed_write_disables_new_turns_without_claiming_persistence ... ok
+test dialogue_store::tests::text_bodies_are_volatile_but_generated_and_displayed_remain_distinct ... ok
+test dialogue_events::tests::persisted_references_survive_restart_without_changing_unknown_to_success ... ok
+test dialogue_events::tests::operation_journal_requires_schema_two_and_keeps_references_on_restart ... ok
+test dialogue::voice_event_tests::voice_references_are_bound_and_generation_is_separate_from_playback ... ok
+test memory_gateway::archived_scope_tests::persisted_expiry_uses_epoch_milliseconds ... ok
+test providers::tests::mock_only_timeout_rate_limit_budget ... ok
+
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+   Doc-tests companion_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_host
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_memory
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_openai
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests companion_voice
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests eva_character_atlas
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,301 @@
+{
+  "schema": 1,
+  "full_goal_complete": false,
+  "source_checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-freshness-c32df29",
+  "previous_checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/voice-ledger-3e6395d",
+  "scope": "Clocked voice freshness and PipeWire completed-drain teardown. Private synthetic audio only.",
+  "workspace_tests": 136,
+  "daemon_tests_in_workspace": 35,
+  "clocked_transport_tests_in_workspace": 5,
+  "eva_library_tests": 295,
+  "eva_ignored_native_tests": 7,
+  "bridge_fixture_tests": 40,
+  "ipc_contracts": 11,
+  "worker_checks": 9,
+  "native_audio_tests": [
+    {
+      "log": "native-audio-complete-24.log",
+      "root": "/tmp/jwm-eva-pw-HAofPW",
+      "passed": true,
+      "tests": 2,
+      "binary_sha256": "0c7bb760176158852bbba41c95b601a06e99a682f8a8c1d7d4874c9c6fc873c6"
+    },
+    {
+      "log": "native-audio-complete-48.log",
+      "root": "/tmp/jwm-eva-pw-IHUn6y",
+      "passed": true,
+      "tests": 2,
+      "binary_sha256": "0c7bb760176158852bbba41c95b601a06e99a682f8a8c1d7d4874c9c6fc873c6"
+    },
+    {
+      "log": "native-pulse-complete.log",
+      "root": "/tmp/jwm-eva-pulse-6phusgou",
+      "passed": true,
+      "tests": 2,
+      "binary_sha256": "0c7bb760176158852bbba41c95b601a06e99a682f8a8c1d7d4874c9c6fc873c6"
+    }
+  ],
+  "native_audio_binary_sha256": "0c7bb760176158852bbba41c95b601a06e99a682f8a8c1d7d4874c9c6fc873c6",
+  "clippy": {
+    "workspace": "strict -D warnings",
+    "eva_existing_exceptions": [
+      "collapsible_if",
+      "needless_borrow",
+      "large_enum_variant",
+      "too_many_arguments"
+    ]
+  },
+  "worker": {
+    "passed": true,
+    "root": "/tmp/eva-c07-worker-case-rlh_1p2l",
+    "scope": "Real Eva observation worker and private daemon ledger/IPC regression.\n\nPlaybackHistory supplies fixture metadata. No microphone, speaker, provider or\nphysical timing evidence is claimed. Run with XDG_SESSION_ID=eva-c07-worker-probe.\n",
+    "daemon_sha256": "c32df29ec419f759150011067ec3cd0baf589429871270fcaa31ef7a7b95293d",
+    "worker_sha256": "5d817e2ee7e02a388997b5390a5a0c5660c03633666f67659084ddbb03dd0dc8",
+    "exact_companion_source_sha256": "c5a41d6564c753af1330e04b8b93009bfc06c188337d08c60ba58c0659911b33",
+    "audio_device_opened": false,
+    "provider_called": false,
+    "checks": [
+      "stopped but connected producer and delayed original frames cannot keep speaking alive; fresh observations restore the same turn",
+      "stale audio pose does not release the durable voice route or allow text generation",
+      "a locally expired source observation is discarded without disconnecting or closing the current turn",
+      "real worker connects, acquires, refreshes identity, closes interrupted turn and releases exact lease",
+      "lost accepted grant is released by the real acquire guard after reconnect",
+      "transport loss prevents old audio-turn replay and a fresh local turn restores observation",
+      "fresh capture pulses maintain listening; process pause and capture stop expire it without inventing played audio",
+      "lost release receipt retries the exact original lease and permits the next activation only after recovery",
+      "actual shared ledger keeps unknown/current and confirmed/lower-bound playback separate, with distinct interruption, disconnect and release outcomes"
+    ],
+    "daemon_pid": 2028575,
+    "worker_pid": 2028577,
+    "ledger_observations": [
+      {
+        "companion_id": "e65e977091b2b045cb03a8a89d68848b",
+        "confirmed_played_samples": 480,
+        "displayed": false,
+        "end": null,
+        "finished": false,
+        "generated": true,
+        "generated_samples": 48000,
+        "interrupted": false,
+        "observed_at_ns": 66163944574975,
+        "reported_played_samples": null,
+        "route": "eva_voice",
+        "session_id": "eva-2028577-1-1",
+        "source_id": "eva-2028577-3c4a3fa2c845e570e3892961b3615438",
+        "turn_id": "eva-1-1-1"
+      },
+      {
+        "companion_id": "e65e977091b2b045cb03a8a89d68848b",
+        "confirmed_played_samples": 1440,
+        "displayed": false,
+        "end": "interrupted",
+        "finished": true,
+        "generated": true,
+        "generated_samples": 48000,
+        "interrupted": true,
+        "observed_at_ns": 66168659679153,
+        "reported_played_samples": 1440,
+        "route": "eva_voice",
+        "session_id": "eva-2028577-1-1",
+        "source_id": "eva-2028577-3c4a3fa2c845e570e3892961b3615438",
+        "turn_id": "eva-1-1-1"
+      },
+      {
+        "companion_id": "e65e977091b2b045cb03a8a89d68848b",
+        "confirmed_played_samples": 480,
+        "displayed": false,
+        "end": "observation_lost",
+        "finished": true,
+        "generated": true,
+        "generated_samples": 24000,
+        "interrupted": false,
+        "observed_at_ns": 66169422092859,
+        "reported_played_samples": null,
+        "route": "eva_voice",
+        "session_id": "eva-2028577-3-3",
+        "source_id": "eva-2028577-3c4a3fa2c845e570e3892961b3615438",
+        "turn_id": "eva-3-3-1"
+      },
+      {
+        "companion_id": "e65e977091b2b045cb03a8a89d68848b",
+        "confirmed_played_samples": 480,
+        "displayed": false,
+        "end": "resources_released",
+        "finished": true,
+        "generated": true,
+        "generated_samples": 24000,
+        "interrupted": false,
+        "observed_at_ns": 66170024697321,
+        "reported_played_samples": 480,
+        "route": "eva_voice",
+        "session_id": "eva-2028577-3-3",
+        "source_id": "eva-2028577-3c4a3fa2c845e570e3892961b3615438",
+        "turn_id": "eva-3-3-2"
+      }
+    ],
+    "freshness": {
+      "stopped_pose": "idle",
+      "original_frames_delayed": 6,
+      "timeout_is_device_release": false
+    },
+    "stable_source_identity_across_reconnects": "eva-2028577-3c4a3fa2c845e570e3892961b3615438",
+    "dependency_scope": "Exact copied Eva companion.rs with the current working-tree client/protocol and saved fixture Cargo.lock; not a production Eva binary or device test.",
+    "cleanup": {
+      "worker_exited": true,
+      "daemon_exited": true,
+      "errors": []
+    }
+  },
+  "worker_archives": [
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker-clocked",
+      "report_sha256": "61061e148b63e56e8d7ec4f04c91babb5930968d6605b1f7e71c8f8ba0708b82",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "9c694363a38d8bb9eaa2f3cd284bc75ff8bdf8d38a1c5a5451e980338f5b689a"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/current-worker",
+      "report_sha256": "62a6b8e5dbe77c55f7caad53f2923a7537dd4ca2ea087b532dd752bf7bf86525",
+      "diagnostic_only": false,
+      "fixture_binary_sha256": "5d817e2ee7e02a388997b5390a5a0c5660c03633666f67659084ddbb03dd0dc8"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker-final",
+      "report_sha256": "5b912a3ea13a2edf3d3710e0c1113780cd633dbd58231a1f0391d19c8c3379a3",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "5be04fcd7c0efc0b4e8df087fa9f1e766421465a21db53b2d8511da1c6f1765a"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker-ready",
+      "report_sha256": "08ea3bcbd6225e4ea4dd50454844d805b3bf4931d55acffcff563a17a2dcbb53",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "565ca8efb413d5377a9758239efb9b819d4e134d80eed1de0db068176a0fa8a3"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker-receipts-final",
+      "report_sha256": "956b4a68f72a2d26d2fb5cd588c3385c41d46747d83fdbd4b460337f147c49b8",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "4af152377e1b9972b45648dd670778da322c44bb0e9e40a20099a546fd8542ed"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker-verified-source",
+      "report_sha256": "cddb6d44852e84bed26163e6ac66a75719492ddc42f72ea5c998271bda743a2f",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "56f05ab113a91048b828a41b05b618cb555e7f3676e80c0c285cc498f21cc33d"
+    },
+    {
+      "path": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-checks-2026-10-31/diagnostic-worker",
+      "report_sha256": "b35c535adc9fdd18f7caf3b441c50b31b518733f14b6ab264e0327aa2e45beea",
+      "diagnostic_only": true,
+      "fixture_binary_sha256": "057941d5eb17b6ffd100d130742bae13df45001fb749b62035a960a18ea03b3d"
+    }
+  ],
+  "baseline_stale": {
+    "root": "/tmp/eva-audio-stale-baseline-xzw37klj",
+    "expected_failure": "voice status should expire without a fresh observation",
+    "audio_device_opened": false,
+    "first": "speak",
+    "after_silence": "speak",
+    "regression_reproduced": true
+  },
+  "matrix": {
+    "passed": true,
+    "report": "/tmp/eva-native-6ity3zzw/matrix-report.json",
+    "error": null,
+    "archive": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-native-matrix-2026-10-31",
+    "archive_manifest_sha256": "852dbdc1cc9bb8d8cef8a10647580b47d2481ca0bad99f902de0465fd830f621"
+  },
+  "earlier_matrix_diagnostic": {
+    "passed": true,
+    "report": "/tmp/eva-native-dn32bir2/matrix-report.json",
+    "error": null,
+    "archive": "/home/yj/projects/jcompanion/docs/evidence/voice-freshness-initial-matrix-2026-10-31",
+    "archive_manifest_sha256": "3058716275bfb3b0c1542051b520ae73d67791692d072bd7ad95048331ed8f7e"
+  },
+  "production": {
+    "jcompaniond": {
+      "repository": "jcompanion",
+      "binary_sha256": "c32df29ec419f759150011067ec3cd0baf589429871270fcaa31ef7a7b95293d",
+      "local_compiler_inputs_sha256": {
+        "crates/companion-client/src/lib.rs": "7197122c55a45c5a9bd50695f3347a60b0a572bd47e64caf3d411e529114bcdf",
+        "crates/companion-core/src/behavior.rs": "5cf8dbbd0bd9d4813fb30415627e77fa3e5ca2a66b2bf04baeb38d643cf4cdd1",
+        "crates/companion-core/src/geometry.rs": "41985d453b52c05db0117bad223ba7ba01eac074333d1378458fdcfdc4c19c19",
+        "crates/companion-core/src/lib.rs": "eb6f3988648ba7b2e0726a22c0b33b498ab7f722ed99afefb4f31c4dfdf8760b",
+        "crates/companion-memory/src/lib.rs": "279652a8c04a183f70522b0c84a7bc3cadb044c7e7ed7fedb656552158edd403",
+        "crates/companion-openai/src/lib.rs": "f9d0af1a0caeb14e8edd796554644707c0c86b8d10a7a450b153ba0df5fa5c95",
+        "crates/companion-protocol/src/lib.rs": "ac42a525c8c65ec80fff3aa18bb17395c13762c5493cb7875751cb8b18ba4440",
+        "crates/companion-protocol/src/strict_json.rs": "164ee7f85ea1922492afb845f2ec56311511a8950985546ed2785be8f98504a1",
+        "crates/companion-voice/src/lib.rs": "9b03ce3417bdc4d47da9407894bac84ec307f0211425f825482b3a95eba55c93",
+        "daemon/src/dialogue.rs": "665a939bd9c300e737cbcc4c571f8e570a01b1bfad36183ec6eebaeb6aae3689",
+        "daemon/src/host_admission.rs": "8b14cc0e3f5f0ef384ee7bd64273b3777418c66bff27a18d39209776e54fff96",
+        "daemon/src/main.rs": "5e0a02c9503076bf88970aa8b97e6dd67de112495b933db1da14d3d1aa958a7f",
+        "daemon/src/memory_gateway.rs": "5e7c4a6b205e7467b1d7b2c59301b3ae66b957a0f56a7e38f49e3a0b1c0dd04f",
+        "daemon/src/providers.rs": "b8a77d1e5ce1aa100f087585c6fbc214caaa78b143666c6871141daab003b062",
+        "daemon/src/storage.rs": "8fbc6c087855a5eda8131d342102eea487397d02b149604533523b6a4b36347a",
+        "daemon/src/task_authority.rs": "33df8e0cc1fd2d5dcc79803b364565e078531af62a00f271c8cc3c579cd4c369",
+        "daemon/src/task_facts.rs": "e08dd41558e7eab8c94f32939d09d417b3d1bbe80cd21e9c9a6c6caa10fb172d"
+      }
+    },
+    "jwm-eva": {
+      "repository": "jwm",
+      "binary_sha256": "e652a5cf9bbc442f6df075406d93cb5f5f0a4f447f73ed99455b548fb58e35d7",
+      "local_compiler_inputs_sha256": {
+        "crates/jwm_eva_core/src/actions/ipc_catalog.json": "ed0a329f38c4cb237865c201c84ad3365af81ba3e9697b0d7d560a3d5203536c",
+        "crates/jwm_eva_core/src/actions/mod.rs": "874e42d00facba1d936d41c2773d66766db1c819b5ad0c56358f7f6bfd10022e",
+        "crates/jwm_eva_core/src/actions/registry.rs": "6bae87f0fa5fb197f4b97458cafe6c12d27f058adde1ad82aa23d74c7c079926",
+        "crates/jwm_eva_core/src/actions/validate.rs": "bf1c597c2ed3a876e8d5fc0b58fc9b5686c5f91bf67844eae5dbf342e20e01fa",
+        "crates/jwm_eva_core/src/companion.rs": "af34302ec7142a7a821a56c4253efcd3aed22cc78c99ba1a8c1a6e0114e7c45f",
+        "crates/jwm_eva_core/src/ledger.rs": "3ae0a127dc4e3e92431b5042997d9b60a4d55e320dc8725c1ddb5b05a7dc2a1b",
+        "crates/jwm_eva_core/src/lib.rs": "cd828c6af84724a5d6e4fb0c5f56a321b79f93f1d16d7be648b42043001d7020",
+        "crates/jwm_eva_core/src/protocol.rs": "c137af87cf63cd13be469384e04c8e50e7116abed4d7791ca3aba463c8e3cba0",
+        "crates/jwm_eva_core/src/realtime.rs": "de2196d7484a1970a1ebe4efb9a3c708f395b3aa422c7c23c0c9063b02140a3b",
+        "crates/jwm_eva_core/src/session.rs": "0c982f8798d7c45d95d3bcde654309dc73eac437789ba10cf098ea659ebe093e",
+        "crates/jwm_eva_core/src/usage.rs": "62491000ef186b0aa256f631386ec27a58c07b424a7f02664d498ef6fd933743",
+        "crates/jwm_ipc_client/src/lib.rs": "b35c825209c2d3bc26496e15e851628f9cc48f4ef4c1f12a94c52cfd4c0803fb",
+        "crates/jwm_ipc_transport/src/lib.rs": "1781a18e0f43fbf6f8456476cf79e7b70fd50d333cf3cb35fbe7d79b1bb30828",
+        "eva/../.git/HEAD": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+        "eva/../.git/packed-refs": "97c03de4ad31e85135b6cf84096ed60f704c0417e9d583d8acf399753a4f6ae8",
+        "eva/../.git/refs/heads/master": "334448d1dc29860208666ed125f9c5bff81531254125ac797590550fa097e296",
+        "eva/build.rs": "d62554c3cd239edd09405898b8fa66ad014d5564b3d910103acfc110b7c3fab6",
+        "eva/src/audio/pulse.rs": "7ac1b922d88a5aa59b76bd212243b809a3a29224df32dfc5834d371ddfa66d20",
+        "eva/src/audio/pulse_playback.rs": "a991e8b7616455b5557a1fcaa7d9988c9bc22008950eb2f31eb88b6b1976c523",
+        "eva/src/audio.rs": "53a3b6ba8c0b67f2a3eb76fba0b5d5a32fa86e793af9fd69e4b0e874c52e0559",
+        "eva/src/companion.rs": "c5a41d6564c753af1330e04b8b93009bfc06c188337d08c60ba58c0659911b33",
+        "eva/src/config.rs": "f12d142e792c95f2e3fbb313176b3ad16211ed21fd76ec0c12dae3f97b40c6e6",
+        "eva/src/context.rs": "eb20a92126c4564f312bd20b5fed77e96dece7b4d8043637d6bf48982f4e75b1",
+        "eva/src/cost_report.rs": "2cb9921aa81f0a278f633816fc3be4cc33313ef9b17e932d1dcbdb436090224f",
+        "eva/src/credentials.rs": "c7ded437a8febb1862d2d64b0dde1691496faaa1167f6757284df0c89d79cc18",
+        "eva/src/daemon.rs": "471c06bcefdd10d274d5ae50c9f0b1fc8ae80b6ce3ad136312650ce6ab011509",
+        "eva/src/diagnostics.rs": "53c2dddd8416b377667d379953c0e6fb10ca6c8d816d3486bdf8f9509fdfde7d",
+        "eva/src/doctor.rs": "d262998f58aa9dccce66b0d5d9dcb1c9fecfb7f58dd81cbf32eb55d08e952510",
+        "eva/src/errors.rs": "e3989d5b4038acb1b793d9ad0ee9c8915c118716a687c8734fd0b277db95e5a4",
+        "eva/src/executor.rs": "d7c58142e30db8966f0ef58d165593e8e1acabe068eb083cb73e7330c0c7858b",
+        "eva/src/feedback.rs": "2d867a498b99fd73d82f7d36cbb1812b4115a1d1287f1f3f3afc905679b4f032",
+        "eva/src/handoff.rs": "38e802a345d72a81a640e0ee9b22a521d3592180f000e9fc5c00df502f20175e",
+        "eva/src/input.rs": "0768250e77eb96b4ce67afde48ee81b9b7106db0cde12500b452e2041fc88086",
+        "eva/src/language.rs": "86f9f2bb843aaaa970c1452fcacfc83a076e9edbbd54ef83414994c41bf69765",
+        "eva/src/lib.rs": "8674c2ac39b6531b4bb3d7342c4ef45f1afd2d33f85e4c976846d8cc5a000329",
+        "eva/src/lifecycle.rs": "108e6b5fa7877a37e5e429eecb77abbca09fafa5096e635ea1b301eb382da65f",
+        "eva/src/main.rs": "3ea237272911b75cf927f409802efe44c10e5854d2627ce83e2147045fffbd73",
+        "eva/src/migration.rs": "5ff73effbd04140a76fa8531d9ce487204ecff09cba1c1f8adfda7cb0391dd2f",
+        "eva/src/pending_task.rs": "770055ebd8b375f66695bf62f41c8c0f8d00fe98e7e7a3c999406118db90741f",
+        "eva/src/planning_input.rs": "2a36c2cdf56643ddb0e71ec7684aead728e7f2a07e0de1d76ec04d5afb8463ed",
+        "eva/src/progress.rs": "0b4d7eeedfe95fa879b886b0cdc8ddc773f0ac2a5cdd65f1c3a49e41c563d0b0",
+        "eva/src/providers/mod.rs": "6a130dc9f7f535003bc758a8c0acf64e12601f97d09fa97df819fe29e9057e9f",
+        "eva/src/providers/openai_realtime.rs": "03d6c4f1e64947bb2d9083381162f1c12b0fc4676ab45e08eb2acd3fc94e8530",
+        "eva/src/report.rs": "186cc22ed2b86c8367f5dbd776e7c870b72663474b8f1fa45b318db0293f116f",
+        "eva/src/result_projection.rs": "3a6a8adb3c33beae97cf6152f9193f6b4a6261e006647a63fb642dcf5a75ca8e",
+        "eva/src/retry.rs": "5513f53c3d60154535e434064deae5a08d860b277d137f01f66605a919854d75",
+        "eva/src/session.rs": "aa3a7dc253ac9be2c710ed2870f30aca081cadcfbd9ccc78bcc58c4019c0c45a",
+        "eva/src/store.rs": "3c0c0a51b1e8652d878eff39addfaf875c45971eb8dfa4fe964d56e4c476bc19",
+        "eva/src/telemetry.rs": "01bb7a8bc49f6869ea6b38839010f73b0205f83df444e6bfaf97cd07b6b89902",
+        "eva/src/voice_control.rs": "eb4c86425bebd0daf4384912335a0c96afa59600a75c600ba0971af21572064f",
+        "eva/src/wake.rs": "b1e5e9a44252cdec6b4317bbfc4946601dee74173ed619e37923c27a04ae4343",
+        "eva/src/warm.rs": "59296e0e12a740a2e52728037b416d3990176b3a8ea0e949cb7e434ff26bc820",
+        "eva/vendor/companion-voice/src/lib.rs": "9b03ce3417bdc4d47da9407894bac84ec307f0211425f825482b3a95eba55c93"
+      }
+    }
+  },
+  "legacy_protocol_unclocked_audio_is_not_freshness": true,
+  "physical_audio_accepted": false
+}

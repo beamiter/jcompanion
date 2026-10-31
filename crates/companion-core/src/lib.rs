@@ -73,6 +73,18 @@ fn default_motion() -> String {
 }
 impl State {
     pub fn validate(&self) -> Result<(), String> {
+        if self
+            .retired_tokens
+            .windows(2)
+            .any(|pair| pair[0].epoch >= pair[1].epoch)
+            || self.possible_body.as_ref().is_some_and(|body| {
+                self.retired_tokens
+                    .last()
+                    .is_some_and(|retired| body.epoch <= retired.epoch)
+            })
+        {
+            return Err("invalid_retirement_epoch_order".into());
+        }
         if self.retired_tokens.len() > 64
             || self.retired_tokens.iter().any(|t| {
                 t.companion_id != self.companion_id
@@ -361,8 +373,31 @@ impl State {
         n.revision += 1;
         n.grant()
     }
+    /// The latest durable retirement covers all *issued* earlier epochs: a
+    /// newer body cannot be granted until the previous possible body retires.
+    /// This does not claim that an arbitrary supplied tuple was ever granted,
+    /// and never clears/relabels the current possible body. Modern reconnect
+    /// can use this monotonic record to re-ack an old host's clearance after
+    /// the bounded exact-token cache has compacted; legacy retirement stays
+    /// on its existing exact-token path.
+    pub fn retirement_record_covers(&self, host: &Host, token: &Token) -> bool {
+        valid_token(token)
+            && token.companion_id == self.companion_id
+            && token.host_id == host.id
+            && token.incarnation == host.incarnation
+            && token.surface_id == host.surface_id
+            && self
+                .retired_tokens
+                .last()
+                .is_some_and(|last| token.epoch <= last.epoch)
+            && self
+                .possible_body
+                .as_ref()
+                .is_none_or(|current| token.epoch < current.epoch)
+    }
     pub fn presented(&self, host: &Host, token: &Token) -> Result<(Self, Vec<Effect>), String> {
-        if self.revoke_intent
+        if !matches!(self.phase, Phase::Granted | Phase::Active)
+            || self.revoke_intent
             || self.possible_body.as_ref() != Some(token)
             || token.boot_id != self.boot_id
             || token.host_id != host.id
@@ -600,6 +635,31 @@ mod tests {
         assert!(s.presented(&host("a"), &t).is_err());
     }
     #[test]
+    fn delayed_presented_cannot_overwrite_a_new_target_preparation() {
+        let s = active();
+        let old = s.possible_body.clone().unwrap();
+        let (preparing, _) = s.request(host("b")).unwrap();
+        preparing.validate().unwrap();
+        // A's first/duplicate presentation may arrive after B was asked to
+        // prepare. It must not change Preparing to Active while retaining B.
+        assert_eq!(
+            preparing.presented(&host("a"), &old).unwrap_err(),
+            "stale_presented"
+        );
+        let (s, effects) = preparing.prepared(&host("b"), 2).unwrap();
+        s.validate().unwrap();
+        assert_eq!(s.possible_body.as_ref(), Some(&old));
+        assert!(matches!(effects[0].reply, Reply::Revoke { .. }));
+        let (s, effects) = s.retired(&host("a"), &old, 1).unwrap();
+        s.validate().unwrap();
+        let new = s.possible_body.clone().unwrap();
+        assert_eq!(new.host_id, "b");
+        assert!(matches!(effects[0].reply, Reply::Grant { .. }));
+        let (s, _) = s.presented(&host("b"), &new).unwrap();
+        assert_eq!(s.phase, Phase::Active);
+        s.validate().unwrap();
+    }
+    #[test]
     fn target_disconnect_does_not_grant() {
         let s = active();
         let old = s.possible_body.clone().unwrap();
@@ -631,7 +691,7 @@ mod fault_traces {
                 rng ^= rng << 13;
                 rng ^= rng >> 7;
                 rng ^= rng << 17;
-                let result = match rng % 8 {
+                let result = match rng % 9 {
                     0 => s.request(h(rng % 4)),
                     1 => s
                         .target
@@ -658,6 +718,21 @@ mod fault_traces {
                     4 => Ok(s.presence(Presence::FollowMe)),
                     5 => Ok((s.disconnected(&format!("h{}", rng % 4)), vec![])),
                     6 => Ok((s.clone().recover(format!("boot{i}")), vec![])),
+                    7 => s
+                        .possible_body
+                        .clone()
+                        .map(|t| {
+                            s.presented(
+                                &Host {
+                                    id: t.host_id.clone(),
+                                    incarnation: t.incarnation,
+                                    surface_id: t.surface_id.clone(),
+                                    retirement: RetirementCapability::NativePresented,
+                                },
+                                &t,
+                            )
+                        })
+                        .unwrap_or_else(|| Err("none".into())),
                     _ => Ok(s.lock(rng & 8 != 0)),
                 };
                 if let Ok((n, e)) = result {

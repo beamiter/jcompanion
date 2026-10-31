@@ -186,6 +186,21 @@ impl Authority {
     pub fn invalidate(&mut self, peer: u64) {
         self.pending.retain(|_, p| p.peer != peer);
     }
+    /// The registered task retains its project when the visible pane moves on.
+    pub fn project_for(&self, host: &Host, task: &str) -> Result<Option<String>, String> {
+        let binding = self
+            .registry
+            .as_ref()
+            .ok_or("task_registry_unavailable")?
+            .tasks
+            .get(task)
+            .ok_or("task_not_registered")?;
+        let owner = Owner::from(host);
+        if binding.owner != owner && !binding.shared.contains(&owner) {
+            return Err("task_owner_required".into());
+        }
+        Ok(binding.project.clone())
+    }
     pub fn propose(
         &mut self,
         peer: u64,

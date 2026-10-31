@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Supported private native X11 mapping generations, unmapped resize ABA, normal idle close, fail-closed crash and complete family matrix; not continuous/physical or full release acceptance.",
+  "implemented": "Real MapNotify/UnmapNotify invalidate old native flight/receipts/control values before IME filtering; counters remain monotonic, map wakes one draw, begin/finish require actual VIEWABLE state.",
+  "binary_sha256": {
+    "jcompaniond": "2dfc4579360a9bcdc86ce7081ad7d8ae7e95be21bc418b855f16061364576de0",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "94b78d3c5d327ba6504820cc7dac34c3e4e0b4e697cf8c22030348b1488a3e3f",
+    "frost": "c9e83135a55789117cbf36d94c6e9d4f2b01b2a6da952cdade16c93ed0a2cee3",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "surface_cases": {
+    "ember-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-ember-remap-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 11
+    },
+    "ember-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-ember-resize-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 11
+    },
+    "ember-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-ember-close-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 8
+    },
+    "ember-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-surface-ember-crash-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 13
+    },
+    "frost-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-frost-remap-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 15
+    },
+    "frost-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-frost-resize-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 16
+    },
+    "frost-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-surface-frost-close-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 11
+    },
+    "frost-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-surface-frost-crash-2026-10-31/surface-report.json",
+      "gui_processes": 2,
+      "root_samples": 14
+    }
+  },
+  "historical": [
+    {
+      "report": "native-surface-ember-initial-roundtrip-2026-10-31/surface-report.json",
+      "raw_passed": true,
+      "finding": "Initial native round trip passed but did not reject a pre-unmap counter; this is weaker than mapping-generation acceptance."
+    },
+    {
+      "report": "native-surface-ember-strict-before-2026-10-31/surface-report.json",
+      "raw_passed": false,
+      "finding": "The strengthened exact-counter native gate failed before the mapping invalidation fix. Original false verdict retained."
+    },
+    {
+      "report": "native-surface-frost-initial-roundtrip-2026-10-31/surface-report.json",
+      "raw_passed": true,
+      "finding": "Initial native round trip passed but did not reject a pre-unmap counter; this is weaker than mapping-generation acceptance."
+    },
+    {
+      "report": "native-surface-frost-strict-before-2026-10-31/surface-report.json",
+      "raw_passed": false,
+      "finding": "The strengthened exact-counter native gate failed before the mapping invalidation fix. Original false verdict retained."
+    }
+  ],
+  "production_source_tests": {
+    "ember": 7,
+    "frost": 9,
+    "strict_clippy": "both passed",
+    "format": "both passed"
+  },
+  "builds": "Both frontend locked/offline builds passed with recorded Rust/Cargo inputs unchanged.",
+  "coordinator_checks_reused": {
+    "binary_and_all_recorded_compile_inputs_unchanged": true,
+    "evidence": "authority-lifecycle-checks-2026-10-31.json",
+    "workspace_tests": 77,
+    "real_ipc_contracts": 5
+  },
+  "authority_regression": {
+    "ember": "native-surface-ember-authority-2026-10-31/lifecycle-report.json",
+    "frost": "native-surface-frost-authority-2026-10-31/lifecycle-report.json",
+    "both_passed": true
+  },
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-surface-final-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "native_pid_markers": 72,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "root_samples": 72,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "ember-2": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "frost-1": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      },
+      "frost-2": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      }
+    }
+  },
+  "cleanup": {
+    "owned_runtime_roots": [
+      "/tmp/eva-native-57gl82jo",
+      "/tmp/eva-native-7at5ant2",
+      "/tmp/eva-native-5rshcrgj",
+      "/tmp/eva-native-9vjyl49f",
+      "/tmp/eva-native-rpfa4as2",
+      "/tmp/eva-native-irqqaqll",
+      "/tmp/eva-native-otoxr84c",
+      "/tmp/eva-native-_33qtl8n",
+      "/tmp/eva-native-4og5uq5u",
+      "/tmp/eva-native-t7za2kxp",
+      "/tmp/eva-native-zt5q3xf8",
+      "/tmp/eva-native-kfg7j1qm",
+      "/tmp/eva-native-4gfcj9z6",
+      "/tmp/eva-native-h4nzhcxx",
+      "/tmp/eva-native-inmx6tra"
+    ],
+    "remaining_processes": []
+  },
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-surface-94b78d3-c9e8313",
+  "source_files_sha256": {
+    "jcompanion/tests/native_surface_lifecycle.py": "198ff9a16a9500681ba67c1d292aa3c1a6999367534dfc75d75488bb40a3fda6",
+    "ember/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "041a1f7d95c6e830316c5acb91c4d749557a07792f82ba8e4a0eaa45740747fc",
+    "ember/vendor/winit/src/platform_impl/linux/x11/event_processor.rs": "a38c729a5693b1f861204c2460aaaf4df7258575ed740c5006953ca4f367b739",
+    "ember/vendor/winit/src/platform_impl/linux/x11/window.rs": "c0012ced2671eca8676cbf9878b9aa8429d406c5037c48c6c0731434f853b8b7",
+    "frost/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "041a1f7d95c6e830316c5acb91c4d749557a07792f82ba8e4a0eaa45740747fc",
+    "frost/vendor/winit/src/platform_impl/linux/x11/event_processor.rs": "a38c729a5693b1f861204c2460aaaf4df7258575ed740c5006953ca4f367b739",
+    "frost/vendor/winit/src/platform_impl/linux/x11/window.rs": "c0012ced2671eca8676cbf9878b9aa8429d406c5037c48c6c0731434f853b8b7"
+  },
+  "remote_ci": "Not run; existing focused receipt CI includes the new production-source test.",
+  "limits": [
+    "Crash cases are expected-negative blocking checks; automatic recovery without trusted destruction proof remains incomplete.",
+    "Resize acceptance is shrink/restore while unmapped. Mapped resize, same-process multiple windows, busy/Vim close guards and real suspend/resume remain pending.",
+    "PNG/default-Cat classification is sampled; capture and journal are not atomic, zero matches do not prove absence; this is not physical scanout or latency/performance evidence.",
+    "Other backends/compositors/drivers, IME/selection/scroll, real voice/API, full UI, trusted single-node fences/anchors and release/performance still require work. Existing Ember UI baseline failures remain recorded."
+  ]
+}

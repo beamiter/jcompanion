@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "scope": "Real daemon IPC contracts. No native pixels, audio devices or provider calls.",
+  "binary_sha256": "07008e470d22bbd017cb4f6ac782fae6a2fdb51101e95e84dc2a48cefdf3d3e3",
+  "passed": false,
+  "tests": [
+    {
+      "test": "__main__.DaemonContracts.test_memory_reviews_scope_isolation_archive_and_durable_delete",
+      "status": "passed",
+      "duration_ms": 397.09
+    },
+    {
+      "test": "__main__.DaemonContracts.test_selection_requires_exact_one_use_consent_and_current_context",
+      "status": "passed",
+      "duration_ms": 204.56
+    },
+    {
+      "test": "__main__.DaemonContracts.test_task_facts_follow_current_context_and_keep_per_task_revision",
+      "status": "failed",
+      "duration_ms": 539.99
+    },
+    {
+      "test": "__main__.DaemonContracts.test_voice_lease_blocks_text_survives_restart_and_needs_exact_owner",
+      "status": "passed",
+      "duration_ms": 348.44
+    }
+  ]
+}

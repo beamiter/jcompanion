@@ -1,0 +1,329 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Supported private Vulkan/JWM/X11 actual busy foreground/inactive-pane and modified external Vim close protection, mapped sizes, mapping/authority regressions and complete sampled matrix. No embedded Vim9 or physical scanout acceptance.",
+  "implemented": [
+    "Ember ordinary close preflights all interactive panes before shared withdrawal, queries real foreground PTY ownership and refuses unverifiable live work. Initial refused intent is unarmed; explicit process termination behavior is retained.",
+    "Ember egui/winit records each forwarded physical press and releases its original logical key even when Shift/layout changes the release symbol. Text and clipboard semantics remain current, focus loss clears the map, and unrepresentable printable keys cannot become control releases.",
+    "Coordinator safe-geometry false-to-true transition replays only the exact target and same durably recorded Preparing epoch. Prepared still validates geometry and epoch; old body is not revoked early."
+  ],
+  "binary_sha256": {
+    "jcompaniond": "47c6be46af524adaca9e96d76953ca9cba31e78b73738a9be26bb9b979a2633f",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "07097f6a07309de1b45c3a3be23b7152abb33900bdad8f34ce13443297e8058e",
+    "frost": "c9e83135a55789117cbf36d94c6e9d4f2b01b2a6da952cdade16c93ed0a2cee3",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "window_use_cases": {
+    "frost-busy": {
+      "passed": true,
+      "report": "native-window-use-frost-busy-2026-10-31/window-use-report.json",
+      "root_samples": 20,
+      "same_final_binary_reuse": true,
+      "fresh_native_prompt_after_work": false
+    },
+    "frost-busy-background": {
+      "passed": true,
+      "report": "native-window-use-frost-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 19,
+      "same_final_binary_reuse": true,
+      "fresh_native_prompt_after_work": false
+    },
+    "frost-external-vim": {
+      "passed": true,
+      "report": "native-window-use-frost-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 17,
+      "same_final_binary_reuse": true,
+      "fresh_native_prompt_after_work": false
+    },
+    "frost-mapped-resize": {
+      "passed": true,
+      "report": "native-window-use-frost-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 18,
+      "same_final_binary_reuse": true,
+      "fresh_native_prompt_after_work": false
+    },
+    "ember-external-vim": {
+      "passed": true,
+      "report": "native-window-use-ember-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-busy": {
+      "passed": true,
+      "report": "native-window-use-ember-busy-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-busy-background": {
+      "passed": true,
+      "report": "native-window-use-ember-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-mapped-resize": {
+      "passed": true,
+      "report": "native-window-use-ember-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": false
+    }
+  },
+  "surface_regression": {
+    "frost-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-frost-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 19
+    },
+    "frost-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-frost-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 13
+    },
+    "frost-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-frost-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 12
+    },
+    "frost-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-window-use-frost-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 15
+    },
+    "ember-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-ember-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "ember-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-ember-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "ember-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-window-use-ember-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 8
+    },
+    "ember-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-window-use-ember-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 13
+    }
+  },
+  "authority_regression": {
+    "frost-authority": {
+      "passed": true,
+      "report": "native-window-use-frost-authority-2026-10-31/lifecycle-report.json"
+    },
+    "ember-authority": {
+      "passed": true,
+      "report": "native-window-use-ember-authority-2026-10-31/lifecycle-report.json"
+    }
+  },
+  "historical": [
+    {
+      "report": "native-window-ember-busy-before-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Actual foreground Python job was killed by ordinary WM close before the guard; held-job-done records SIGHUP."
+    },
+    {
+      "report": "native-window-frost-geometry-stall-before-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Frost preserved work and retired exactly, but transient unsafe geometry left the receiving target Preparing indefinitely."
+    },
+    {
+      "report": "native-window-ember-preserved-layout-failed-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Work survived after the close guard. The original fixture incorrectly demanded eligible canvas from an idle foreground group; a Prompt without structural composer padding is deliberately ineligible."
+    },
+    {
+      "report": "native-window-ember-external-vim-layout-failed-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Real modified external Vim was preserved and saved, but body visibility did not recover. Later key diagnostics identified unmatched shifted logical releases; original failure retained."
+    },
+    {
+      "report": "native-window-ember-preserved-layout-repeat-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Repeated original idle-implies-geometry assumption fails with the fixed coordinator too; native empty Return, rather than weaker rendering protection, is required by the corrected fixture."
+    },
+    {
+      "report": "native-window-ember-layout-diagnostic-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Temporary diagnostic build observed Prompt and no composer/safe surface. Diagnostic instrumentation was removed; this binary is not the final accepted build."
+    },
+    {
+      "report": "native-window-ember-external-vim-fresh-prompt-failed-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "A fresh native prompt still did not restore Eva: actual shifted punctuation remained held in egui. This stronger native failure led to the physical-key pairing fix."
+    },
+    {
+      "report": "native-window-ember-vim-layout-gate-diagnostic-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Temporary diagnostic build observed a valid structural surface, but input protection remained active. Not a final accepted binary."
+    },
+    {
+      "report": "native-window-ember-vim-keys-diagnostic-2026-10-31/window-use-report.json",
+      "raw_passed": false,
+      "finding": "Temporary diagnostic build observed OpenCurlyBracket, CloseCurlyBracket and Colon still in egui keys_down after actual releases and Vim exit. No text payloads were logged; instrumentation removed from final source."
+    },
+    {
+      "report": "native-window-ember-busy-before-key-fix-2026-10-31/window-use-report.json",
+      "raw_passed": true,
+      "finding": "Close guard already passed with a fresh native prompt before the later punctuation fix; retained as earlier binary evidence only."
+    },
+    {
+      "report": "native-window-ember-busy-background-before-key-fix-2026-10-31/window-use-report.json",
+      "raw_passed": true,
+      "finding": "Inactive-pane work preservation already passed before the later punctuation fix; retained as earlier binary evidence only."
+    },
+    {
+      "report": "native-window-ember-mapped-before-key-fix-2026-10-31/window-use-report.json",
+      "raw_passed": true,
+      "finding": "Earlier mapped-size acceptance on the pre-key-fix Ember binary; current mapped sizes were rerun on the final binary."
+    },
+    {
+      "report": "native-window-frost-busy-repeat-before-2026-10-31/window-use-report.json",
+      "raw_passed": true,
+      "finding": "The transient geometry race did not occur in this old-coordinator repeat. Passing repeat does not erase the prior native stall."
+    }
+  ],
+  "visual_review": {
+    "external_vim_preserved": "native-window-use-ember-external-vim-2026-10-31/006-busy-close-preserves-window-and-work.png",
+    "external_vim_survivor_body": "native-window-use-ember-external-vim-2026-10-31/014-waiting-ember-2.png",
+    "scope": "Human image inspection confirms actual modified Vim UI before save and one surviving GUI/body after exact healthy close."
+  },
+  "coordinator": {
+    "workspace_tests": 77,
+    "strict_all_target_clippy": "passed",
+    "format": "passed",
+    "real_ipc_contracts": 7,
+    "process_faults": "passed",
+    "regressions_before": {
+      "passed": false,
+      "failed": 2,
+      "passed_other": 5
+    }
+  },
+  "egui_winit_keys": {
+    "tests": 8,
+    "strict_all_target_clippy": "passed",
+    "format": "passed",
+    "scope": "Actual egui held-key state, changed shifted release/repeat, suppressed printable/control release and existing logical/physical/shortcut fallback contracts."
+  },
+  "frontend_builds": "Both locked/offline builds passed; recorded Rust/Cargo inputs unchanged.",
+  "ember_window_tests": {
+    "passed": 5,
+    "log": "window-use-checks-2026-10-31/ember-window-tests-final.log"
+  },
+  "receipt_harness_reused": {
+    "ember": 7,
+    "frost": 9,
+    "compile_sources_and_harness_inputs_match": true,
+    "evidence": "surface-lifecycle-checks-2026-10-31.json"
+  },
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-window-use-final-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "native_pid_markers": 72,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "root_samples": 69,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "ember-2": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "frost-1": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      },
+      "frost-2": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      }
+    }
+  },
+  "cleanup": {
+    "owned_runtime_roots": [
+      "/tmp/eva-native-1z721jfq",
+      "/tmp/eva-native-2ljsextd",
+      "/tmp/eva-native-302nzo6f",
+      "/tmp/eva-native-33c_axpo",
+      "/tmp/eva-native-3ptq7gcx",
+      "/tmp/eva-native-4edbpxtu",
+      "/tmp/eva-native-7kh04f1k",
+      "/tmp/eva-native-9o665p7_",
+      "/tmp/eva-native-_jndlq_e",
+      "/tmp/eva-native-a3v6u_3d",
+      "/tmp/eva-native-a9p9g3_p",
+      "/tmp/eva-native-bnuufsbs",
+      "/tmp/eva-native-d_zovz9a",
+      "/tmp/eva-native-f88ypmzr",
+      "/tmp/eva-native-ftnjappz",
+      "/tmp/eva-native-h_tot4z_",
+      "/tmp/eva-native-l6z4n59p",
+      "/tmp/eva-native-n_k6xsnx",
+      "/tmp/eva-native-ppwx_p0w",
+      "/tmp/eva-native-qgnlctq2",
+      "/tmp/eva-native-rv8om9_2",
+      "/tmp/eva-native-s3m19o4o",
+      "/tmp/eva-native-s8wzq1ah",
+      "/tmp/eva-native-s92w3gik",
+      "/tmp/eva-native-tjcm71oj",
+      "/tmp/eva-native-uncw505t",
+      "/tmp/eva-native-uy1plg8z",
+      "/tmp/eva-native-vc9p6zn5",
+      "/tmp/eva-native-xd0u0n2z",
+      "/tmp/eva-native-yn5gly7w",
+      "/tmp/eva-native-ynczwv1h",
+      "/tmp/eva-native-zrfu2_m9"
+    ],
+    "remaining_processes": []
+  },
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-window-use-07097f6-47c6be4",
+  "source_files_sha256": {
+    "jcompanion/daemon/src/main.rs": "93c16662cdf9dde179b653f0eb164a13c36c49971640fe1e6357ac4cee65f15f",
+    "jcompanion/tests/ipc_contracts.py": "13acc3f639caaef7b8e9b450f038eeb90738dd40e82e1bc676880e02ce60c27a",
+    "jcompanion/tests/native_window_use.py": "8ad48734dc0d67acbec2f51d34b9f3b29d44a2870d395865b7f4b630ce215d20",
+    "ember/src/app/window.rs": "cff0d568ff9247173ebc14f58ed27da87dfc7a088233c7165dcb3d9f6401c61f",
+    "ember/src/eva_companion.rs": "b5551d14d525fb5338f30f2fb48277e61a3e8f200a8431ae40f99478ee27bd57",
+    "ember/src/main.rs": "d4e96546bbef8c3157dea0550ef2e772276eef90b0a79ca0481ae28901ac8be3",
+    "ember/vendor/egui-winit/src/lib.rs": "0d2d0c3a7a2431b42a88b7de62d6a61d0195c1ff9661c040ca016cea24b04646"
+  },
+  "remote_ci": "Not run; seven real IPC contracts are included by the existing CI runner.",
+  "limits": [
+    "External /usr/bin/vim and real modified buffer acceptance is distinct from embedded Vim9 IDE dialogs and its deferred close path; the latter remains pending.",
+    "An idle PTY foreground group is not safe canvas geometry. The corrected Ember work fixture requests a real fresh empty prompt after verifying one second without auto-close; historical strict visibility failures remain unchanged.",
+    "Crash cases stay recovery_blocked without trusted destruction proof; no automatic recovery, CompositorPresented or physical/continuous uniqueness is claimed.",
+    "Mapped sizes are three same-window dimensions in private Xvfb, not multi-monitor/DPI or performance acceptance.",
+    "Physical/logical key pairing passed on the tested X11 path; actual IME and other keyboard backends still require native acceptance. Same-process native windows, suspend/resume, IME/selection/scroll, other drivers/backends, voice/API, trusted single-node fences/anchors, performance/release and the two known Ember UI baseline failures remain open."
+  ]
+}

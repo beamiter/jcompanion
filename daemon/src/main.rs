@@ -1,9 +1,13 @@
 //! Single-threaded authority. Durable state is committed BEFORE any revoke/grant is enqueued.
 mod dialogue;
+mod dialogue_events;
+mod dialogue_store;
+mod host_admission;
 mod memory_gateway;
 mod providers;
 mod storage;
 mod task_authority;
+mod task_facts;
 use companion_client::Framed;
 use companion_core::{
     behavior::{Facts, FocusPolicy, Motion, Scheduler, Work},
@@ -24,6 +28,7 @@ use std::{
 use storage::{random_id, Store};
 struct Peer {
     withdrawing: bool,
+    admission: host_admission::Admission,
     desktop: Option<String>,
     desktop_authorized: bool,
     delivery_failed: bool,
@@ -34,8 +39,10 @@ struct Peer {
     compositor: bool,
     focused: bool,
     geometry_revision: u64,
-    task: Option<(String, u64, TaskStatus)>,
+    tasks: task_facts::TaskFacts,
     eva: Option<String>,
+    voice_clocked_since: Option<u64>,
+    voice_dialogue: bool,
     io: Framed,
     host: Option<Host>,
     seq: u64,
@@ -54,7 +61,7 @@ fn isolate_delivery(failed: &mut bool, result: io::Result<()>) {
 impl Peer {
     // Uniform call sites retain Result for storage/encoding workflow; wire failure is
     // recorded for connection-local teardown, never escalated to authority failure.
-    fn queue(&mut self, reply: &Reply) -> io::Result<()> {
+    fn queue<T: serde::Serialize>(&mut self, reply: &T) -> io::Result<()> {
         if !self.delivery_failed {
             let result = self.io.queue(reply);
             isolate_delivery(&mut self.delivery_failed, result);
@@ -217,10 +224,16 @@ fn run() -> io::Result<()> {
     let mut scheduler = Scheduler::new(1);
     let mut last_tick = 0;
     let mut pose = "idle".to_owned();
-    let mut audio = AudioTracker::default();
+    let debug_voice = env::var("EVA_COMPANION_DEBUG_VOICE").as_deref() == Ok("1");
     let mut memories = memory_gateway::Gateway::open(&dir.join("memory.sqlite"));
     let mut task_authority = task_authority::Authority::open(&dir);
     let (mut provider, provider_diagnostic) = load_provider(&dir);
+    provider.ledger = dialogue::Ledger::open(&dir, &state.companion_id, &state.boot_id)
+        .unwrap_or_else(|_| {
+            eprintln!("EVA dialogue history unavailable; new provider turns are disabled");
+            dialogue::Ledger::unavailable()
+        });
+    let mut history_failure_reported = provider.ledger.journal_failed();
     let mut turn_owners = HashMap::<String, (u64, ContextRef)>::new();
     loop {
         loop {
@@ -238,6 +251,7 @@ fn run() -> io::Result<()> {
                         next_id,
                         Peer {
                             withdrawing: false,
+                            admission: host_admission::Admission::default(),
                             desktop: None,
                             desktop_authorized: desktop_exe.as_ref() == Some(&executable),
                             delivery_failed: false,
@@ -248,8 +262,10 @@ fn run() -> io::Result<()> {
                             compositor: false,
                             focused: false,
                             geometry_revision: 0,
-                            task: None,
+                            tasks: task_facts::TaskFacts::default(),
                             eva: None,
+                            voice_clocked_since: None,
+                            voice_dialogue: false,
                             io: Framed::new(s)?,
                             host: None,
                             seq: 0,
@@ -297,7 +313,7 @@ fn run() -> io::Result<()> {
             if dead.contains(&id) || peers.get(&id).is_some_and(|p| p.delivery_failed) {
                 continue;
             }
-            let result = decode(&bytes);
+            let result = companion_voice::decode(&bytes);
             let mut rejection = None;
             if let Some(p) = peers.get_mut(&id) {
                 if p.window.elapsed() >= Duration::from_secs(1) {
@@ -324,7 +340,7 @@ fn run() -> io::Result<()> {
                         rejection = Some(e)
                     }
                 }
-                Ok(e) => {
+                Ok((e, extension)) => {
                     let p = peers.get_mut(&id).unwrap();
                     if e.session_id != session
                         || e.source_seq <= p.seq
@@ -355,8 +371,15 @@ fn run() -> io::Result<()> {
                             commit(&store, &mut state, change, &mut peers)?;
                         }
                     } else if matches!(e.body, Request::EvaHello) {
+                        let dialogue =
+                            matches!(extension, Some(companion_voice::Extension::HelloDialogue));
+                        let clocked = dialogue
+                            || matches!(extension, Some(companion_voice::Extension::Hello));
+                        let clock = companion_voice::boottime_ns();
                         if p.host.is_some()
                             || p.eva.is_some()
+                            || p.desktop.is_some()
+                            || (clocked && clock.is_none())
                             || !e.boot_id.is_empty()
                             || peers.values().any(|p| p.eva.is_some())
                         {
@@ -366,16 +389,33 @@ fn run() -> io::Result<()> {
                             p.seq = e.source_seq;
                             p.events.insert(e.event_id);
                             p.eva = Some(e.source_id);
-                            p.queue(&Reply::Accepted {
-                                boot_id: state.boot_id.clone(),
-                                companion_id: state.companion_id.clone(),
-                                session_id: session.clone(),
-                            })?;
+                            if clocked {
+                                p.voice_clocked_since = clock;
+                                p.voice_dialogue = dialogue;
+                                let accepted = companion_voice::Accepted::new(
+                                    state.boot_id.clone(),
+                                    state.companion_id.clone(),
+                                    session.clone(),
+                                );
+                                p.queue(&if dialogue {
+                                    accepted.with_dialogue()
+                                } else {
+                                    accepted
+                                })?;
+                            } else {
+                                p.queue(&Reply::Accepted {
+                                    boot_id: state.boot_id.clone(),
+                                    companion_id: state.companion_id.clone(),
+                                    session_id: session.clone(),
+                                })?;
+                            }
                         }
-                    } else if let Request::Hello { host } | Request::CompositorHello { host } =
-                        e.body.clone()
+                    } else if let Request::Hello { host }
+                    | Request::CompositorHello { host }
+                    | Request::HelloWithFeatures { host, .. } = e.body.clone()
                     {
                         let compositor = matches!(e.body, Request::CompositorHello { .. });
+                        let modern = matches!(e.body, Request::HelloWithFeatures { .. });
                         if p.host.is_some()
                             || p.eva.is_some()
                             || p.desktop.is_some()
@@ -398,11 +438,23 @@ fn run() -> io::Result<()> {
                             p.events.insert(e.event_id);
                             p.host = Some(host.clone());
                             p.compositor = compositor;
-                            p.queue(&Reply::Accepted {
-                                boot_id: state.boot_id.clone(),
-                                companion_id: state.companion_id.clone(),
-                                session_id: session.clone(),
-                            })?;
+                            if modern {
+                                let nonce = random_id()?;
+                                p.admission.negotiate(nonce.clone());
+                                p.queue(&Reply::HostAccepted {
+                                    boot_id: state.boot_id.clone(),
+                                    companion_id: state.companion_id.clone(),
+                                    session_id: session.clone(),
+                                    features: vec![HostFeature::WithdrawalResumeV1],
+                                    connection_nonce: nonce,
+                                })?;
+                            } else {
+                                p.queue(&Reply::Accepted {
+                                    boot_id: state.boot_id.clone(),
+                                    companion_id: state.companion_id.clone(),
+                                    session_id: session.clone(),
+                                })?;
+                            }
                             p.queue(&snapshot(&state, &pose))?;
                             p.queue(&Reply::Appearance {
                                 skin: if state.night {
@@ -477,15 +529,15 @@ fn run() -> io::Result<()> {
                                     session_id: voice_session,
                                     include_global_memory,
                                 } => {
-                                    if !state.locked
-                                        && !(state.desktop_observed && !state.desktop_known)
+                                    let owned = !state.locked
+                                        && (!state.desktop_observed || state.desktop_known)
                                         && unix_millis() > 0
                                         && state.voice_lease.as_ref()
                                             == Some(&VoiceLease {
                                                 source_id: source.clone(),
                                                 session_id: voice_session.clone(),
-                                            })
-                                    {
+                                            });
+                                    if owned && provider.ledger.voice_capacity() {
                                         let (entries, status) = if include_global_memory {
                                             match memories.voice_global(unix_millis()) {
                                                 Ok(entries) => (
@@ -508,7 +560,12 @@ fn run() -> io::Result<()> {
                                     } else {
                                         p.queue(&Reply::OperationError {
                                             operation: "voice_context".into(),
-                                            reason: "voice_lease_not_owned".into(),
+                                            reason: if owned {
+                                                "voice_ledger_capacity"
+                                            } else {
+                                                "voice_lease_not_owned"
+                                            }
+                                            .into(),
                                         })?;
                                     }
                                 }
@@ -520,10 +577,11 @@ fn run() -> io::Result<()> {
                                         session_id: voice_session.clone(),
                                     };
                                     let granted = !state.locked
-                                        && !(state.desktop_observed && !state.desktop_known)
+                                        && (!state.desktop_observed || state.desktop_known)
                                         && provider.active_turn().is_none()
-                                        && (state.voice_lease.is_none()
-                                            || state.voice_lease.as_ref() == Some(&desired));
+                                        && (state.voice_lease.as_ref() == Some(&desired)
+                                            || (state.voice_lease.is_none()
+                                                && provider.ledger.voice_capacity()));
                                     if granted && state.voice_lease.is_none() {
                                         let mut n = state.clone();
                                         n.voice_lease = Some(desired);
@@ -550,7 +608,13 @@ fn run() -> io::Result<()> {
                                         n.revision += 1;
                                         store.commit(&n)?;
                                         state = n;
-                                        audio.disconnect();
+                                        trace_voice(
+                                            debug_voice,
+                                            provider.ledger.release_voice(&VoiceLease {
+                                                source_id: source.clone(),
+                                                session_id: voice_session.clone(),
+                                            }),
+                                        );
                                         p.queue(&Reply::VoiceReleased {
                                             session_id: voice_session.clone(),
                                         })?;
@@ -572,31 +636,87 @@ fn run() -> io::Result<()> {
                                     played_samples,
                                     interrupted,
                                 } => {
-                                    if !matches!(
-                                        status,
-                                        AudioState::Idle | AudioState::Stopped | AudioState::Error
-                                    ) && state
+                                    if let Some(companion_voice::Extension::Dialogue(record)) =
+                                        extension.as_ref()
+                                    {
+                                        let now = companion_voice::boottime_ns();
+                                        let result = if !p.voice_dialogue
+                                            || p.voice_clocked_since
+                                                .is_none_or(|since| record.observed_at_ns < since)
+                                        {
+                                            Err("voice_dialogue_not_negotiated_or_old_connection")
+                                        } else if let Some(now) = now {
+                                            provider.ledger.voice_event(source, record, now)
+                                        } else {
+                                            Err("voice_clock_unavailable")
+                                        };
+                                        if let Err(reason) = result {
+                                            p.queue(&Reply::OperationError {
+                                                operation: "voice_dialogue".into(),
+                                                reason: reason.into(),
+                                            })?;
+                                        }
+                                        continue;
+                                    }
+                                    let Some(owner) = state
                                         .voice_lease
                                         .as_ref()
-                                        .is_none_or(|v| v.source_id != *source)
-                                    {
+                                        .filter(|owner| owner.source_id == *source)
+                                    else {
                                         p.queue(&Reply::OperationError {
                                             operation: "audio".into(),
                                             reason: "voice_permit_required".into(),
                                         })?;
                                         continue;
-                                    }
-                                    if let Err(e) = audio.observe(
-                                        turn_id,
-                                        status,
-                                        generated_samples,
-                                        played_samples,
-                                        interrupted,
-                                    ) {
+                                    };
+                                    let Some(companion_voice::Extension::Audio(clock)) = extension
+                                    else {
                                         p.queue(&Reply::OperationError {
                                             operation: "audio".into(),
-                                            reason: e,
+                                            reason: "timestamped_audio_required".into(),
                                         })?;
+                                        continue;
+                                    };
+                                    let Some(received_at_ns) = companion_voice::boottime_ns()
+                                    else {
+                                        p.queue(&Reply::OperationError {
+                                            operation: "audio".into(),
+                                            reason: "voice_clock_unavailable".into(),
+                                        })?;
+                                        continue;
+                                    };
+                                    if p.voice_clocked_since
+                                        .is_none_or(|since| clock.observed_at_ns < since)
+                                    {
+                                        p.queue(&Reply::OperationError {
+                                            operation: "audio".into(),
+                                            reason: "audio_clock_not_negotiated_or_old_connection"
+                                                .into(),
+                                        })?;
+                                        continue;
+                                    }
+                                    if let Err(error) =
+                                        provider.ledger.observe_voice(dialogue::VoiceObservation {
+                                            companion_id: &state.companion_id,
+                                            owner,
+                                            turn_id: &turn_id,
+                                            state: status,
+                                            generated_samples,
+                                            played_samples,
+                                            interrupted,
+                                            observed_at_ns: clock.observed_at_ns,
+                                            received_at_ns,
+                                        })
+                                    {
+                                        p.queue(&Reply::OperationError {
+                                            operation: "audio".into(),
+                                            reason: error.into(),
+                                        })?;
+                                    } else {
+                                        trace_voice(
+                                            debug_voice,
+                                            provider.ledger.voice_record_for(owner, &turn_id),
+                                        );
                                     }
                                 }
                                 _ => rejection = Some("audio_role_only".into()),
@@ -610,11 +730,61 @@ fn run() -> io::Result<()> {
                         p.seq = e.source_seq;
                         p.events.insert(e.event_id);
                         let h = p.host.clone().unwrap();
+                        let mut body = e.body;
+                        if let Request::HostMetadata {
+                            connection_nonce,
+                            admission_epoch,
+                            metadata,
+                        } = body
+                        {
+                            if !p
+                                .admission
+                                .metadata_matches(&connection_nonce, admission_epoch)
+                            {
+                                p.queue(&Reply::OperationError {
+                                    operation: "host_metadata".into(),
+                                    reason: "stale_host_admission".into(),
+                                })?;
+                                continue;
+                            }
+                            body = metadata.into_request();
+                        } else if p.admission.modern()
+                            && matches!(
+                                body,
+                                Request::Focus { .. }
+                                    | Request::Geometry { .. }
+                                    | Request::Input { .. }
+                                    | Request::ContextObserved { .. }
+                            )
+                        {
+                            p.queue(&Reply::OperationError {
+                                operation: "host_metadata".into(),
+                                reason: "host_metadata_scope_required".into(),
+                            })?;
+                            continue;
+                        }
+                        if p.admission.modern()
+                            && !p.admission.admitted
+                            && !matches!(
+                                body,
+                                Request::ActivateHost { .. }
+                                    | Request::WithdrawIntent { .. }
+                                    | Request::ResumeWithdrawal { .. }
+                                    | Request::Retired { .. }
+                                    | Request::Resync
+                            )
+                        {
+                            p.queue(&Reply::OperationError {
+                                operation: "host_admission".into(),
+                                reason: "host_not_admitted".into(),
+                            })?;
+                            continue;
+                        }
                         if (unix_millis() == 0
                             || state.locked
                             || (state.desktop_observed && !state.desktop_known))
                             && matches!(
-                                e.body,
+                                body,
                                 Request::ContextAccessRequested { .. }
                                     | Request::ContextAccessGranted { .. }
                                     | Request::MemoryScopeReviewRequested { .. }
@@ -637,7 +807,7 @@ fn run() -> io::Result<()> {
                             continue;
                         }
                         if matches!(
-                            e.body,
+                            body,
                             Request::DialogueStart { .. }
                                 | Request::ContextAccessRequested { .. }
                                 | Request::MemoryUse { .. }
@@ -657,7 +827,7 @@ fn run() -> io::Result<()> {
                             }
                         }
                         let now = start.elapsed().as_millis() as u64;
-                        let change = match e.body {
+                        let change = match body {
                             Request::ContextObserved { context } => {
                                 if context.host_id != h.id
                                     || p.context.as_ref().is_some_and(|old| {
@@ -851,11 +1021,16 @@ fn run() -> io::Result<()> {
                                                 approved_selection,
                                             };
                                             let targets = context.task_id.iter().cloned().collect();
-                                            match provider.start(
-                                                turn,
+                                            let publisher = Some(dialogue::Publisher {
+                                                source_id: e.source_id.clone(),
+                                                host_incarnation: h.incarnation,
+                                            });
+                                            match provider.start_owned(
+                                                turn.clone(),
                                                 &state.name,
                                                 &memory,
                                                 targets,
+                                                publisher.clone(),
                                             ) {
                                                 Ok(()) => {
                                                     turn_owners.insert(
@@ -872,13 +1047,13 @@ fn run() -> io::Result<()> {
                                                 Err(companion_openai::Error::Disabled) => {
                                                     let offline = provider
                                                         .ledger
-                                                        .begin(
-                                                            &turn_id,
-                                                            context.clone(),
+                                                        .begin_input(
+                                                            &turn,
                                                             dialogue::Route::Offline,
+                                                            publisher,
                                                         )
                                                         .and_then(|_| {
-                                                            provider.ledger.finish(&turn_id, true)
+                                                            provider.ledger.finish_output(&turn_id, "我在这里。当前是离线陪伴模式：可以换形象、跟随、安静陪伴和管理经过确认的本地记忆；云端文字模型未启用或配置不可用。我不会读取终端内容或执行命令。")
                                                         });
                                                     if offline.is_ok() {
                                                         turn_owners.insert(
@@ -886,7 +1061,16 @@ fn run() -> io::Result<()> {
                                                             (id, context.clone()),
                                                         );
                                                     }
-                                                    p.queue(&Reply::Dialogue{turn_id,context,status:if offline.is_ok(){"offline"}else{"duplicate_turn"}.into(),reply:offline.ok().map(|_|"我在这里。当前是离线陪伴模式：可以换形象、跟随、安静陪伴和管理经过确认的本地记忆；云端文字模型未启用或配置不可用。我不会读取终端内容或执行命令。".into())})?;
+                                                    let (status, reply) = match offline {
+                                                        Ok(()) => ("offline".into(), Some("我在这里。当前是离线陪伴模式：可以换形象、跟随、安静陪伴和管理经过确认的本地记忆；云端文字模型未启用或配置不可用。我不会读取终端内容或执行命令。".into())),
+                                                        Err(error) => (format!("dialogue_{error}"), None),
+                                                    };
+                                                    p.queue(&Reply::Dialogue {
+                                                        turn_id,
+                                                        context,
+                                                        status,
+                                                        reply,
+                                                    })?;
                                                 }
                                                 Err(error) => p.queue(&Reply::Dialogue {
                                                     turn_id,
@@ -927,7 +1111,124 @@ fn run() -> io::Result<()> {
                                 }
                                 None
                             }
+                            Request::ActivateHost { connection_nonce } => {
+                                let was_admitted = p.admission.admitted;
+                                match p.admission.activate(&connection_nonce, &h, &state) {
+                                    Ok(reply) => {
+                                        if !was_admitted {
+                                            p.geometry = false;
+                                            p.focused = false;
+                                            focus.clear(&h.id);
+                                        }
+                                        p.queue(&reply)?;
+                                    }
+                                    Err(reason) => p.queue(&Reply::OperationError {
+                                        operation: "host_activate".into(),
+                                        reason,
+                                    })?,
+                                }
+                                None
+                            }
+                            Request::WithdrawIntent {
+                                connection_nonce,
+                                intent,
+                                previous_token,
+                            } => {
+                                match p.admission.withdraw(
+                                    &connection_nonce,
+                                    intent,
+                                    previous_token,
+                                    &h,
+                                    &state,
+                                ) {
+                                    Err(reason) => {
+                                        p.queue(&Reply::OperationError {
+                                            operation: "withdrawal".into(),
+                                            reason,
+                                        })?;
+                                        None
+                                    }
+                                    Ok(false) => {
+                                        if let Some(reply) = p.admission.ready(&h, &state) {
+                                            p.queue(&reply)?;
+                                        }
+                                        None
+                                    }
+                                    Ok(true) => {
+                                        p.withdrawing = true;
+                                        p.geometry = false;
+                                        p.focused = false;
+                                        focus.clear(&h.id);
+                                        p.context = None;
+                                        p.selection = None;
+                                        p.memory_scopes.clear();
+                                        memories.invalidate(id);
+                                        task_authority.invalidate(id);
+                                        Some(state.cancel_recall(&h.id).withdraw(&h).map(
+                                            |(n, mut effects)| {
+                                                // A previous exact token may have left the bounded cache.
+                                                // Reconcile it through a fresh host clearance; the durable
+                                                // monotonic retirement record can only re-ack old epochs.
+                                                if effects.is_empty() {
+                                                    if let Some(token) =
+                                                        p.admission.withdrawal_token()
+                                                    {
+                                                        effects.push(Effect {
+                                                            host: h.id.clone(),
+                                                            reply: Reply::Revoke {
+                                                                token: token.clone(),
+                                                            },
+                                                        });
+                                                    }
+                                                }
+                                                if let Some(reply) = p.admission.ready(&h, &n) {
+                                                    effects.push(Effect {
+                                                        host: h.id.clone(),
+                                                        reply,
+                                                    });
+                                                }
+                                                (n, effects)
+                                            },
+                                        ))
+                                    }
+                                }
+                            }
+                            Request::ResumeWithdrawal {
+                                connection_nonce,
+                                intent,
+                            } => {
+                                match p.admission.resume(&connection_nonce, intent, &h, &state) {
+                                    Err(reason) => p.queue(&Reply::OperationError {
+                                        operation: "withdrawal_resume".into(),
+                                        reason,
+                                    })?,
+                                    Ok((reply, changed)) => {
+                                        if changed {
+                                            p.withdrawing = false;
+                                            p.geometry = false;
+                                            p.focused = false;
+                                            p.input = false;
+                                            p.selecting = false;
+                                            focus.clear(&h.id);
+                                            p.context = None;
+                                            p.selection = None;
+                                            p.memory_scopes.clear();
+                                            memories.invalidate(id);
+                                            task_authority.invalidate(id);
+                                        }
+                                        p.queue(&reply)?;
+                                    }
+                                }
+                                None
+                            }
                             Request::Withdraw => {
+                                if p.admission.modern() {
+                                    p.queue(&Reply::OperationError {
+                                        operation: "withdrawal".into(),
+                                        reason: "intent_withdrawal_required".into(),
+                                    })?;
+                                    continue;
+                                }
                                 p.withdrawing = true;
                                 p.geometry = false;
                                 p.focused = false;
@@ -1002,13 +1303,32 @@ fn run() -> io::Result<()> {
                             Request::Retired {
                                 token,
                                 presentation_serial,
-                            } => Some(state.retired(&h, &token, presentation_serial).map(
-                                |(n, mut effects)| {
+                            } => {
+                                let transition = state
+                                    .retired(&h, &token, presentation_serial)
+                                    .or_else(|error| {
+                                        if p.admission.modern()
+                                            && presentation_serial > 0
+                                            && state.retirement_record_covers(&h, &token)
+                                        {
+                                            Ok((state.clone(), vec![]))
+                                        } else {
+                                            Err(error)
+                                        }
+                                    });
+                                Some(transition.map(|(n, mut effects)| {
                                     effects.push(Effect {
                                         host: h.id.clone(),
                                         reply: Reply::RetirementAccepted { token },
                                     });
-                                    if p.withdrawing
+                                    if p.admission.modern() {
+                                        if let Some(reply) = p.admission.ready(&h, &n) {
+                                            effects.push(Effect {
+                                                host: h.id.clone(),
+                                                reply,
+                                            });
+                                        }
+                                    } else if p.withdrawing
                                         && n.possible_body.as_ref().is_none_or(|t| {
                                             t.host_id != h.id || t.incarnation != h.incarnation
                                         })
@@ -1022,13 +1342,15 @@ fn run() -> io::Result<()> {
                                         });
                                     }
                                     (n, effects)
-                                },
-                            )),
+                                }))
+                            }
                             Request::Presented { token } => Some(state.presented(&h, &token)),
                             Request::Recall => Some(if state.compositor_only != p.compositor {
                                 Err("host_is_anchor_only_in_current_mode".into())
                             } else if p.withdrawing {
                                 Err("host_withdrawing".into())
+                            } else if !p.admission.admitted {
+                                Err("host_not_admitted".into())
                             } else {
                                 Ok(state.recall(h))
                             }),
@@ -1057,6 +1379,7 @@ fn run() -> io::Result<()> {
                                         reason: "stale_geometry".into(),
                                     })?;
                                 } else {
+                                    let was_safe = p.geometry;
                                     p.geometry_revision = revision;
                                     p.geometry = !matches!(
                                         companion_core::geometry::choose(
@@ -1068,6 +1391,17 @@ fn run() -> io::Result<()> {
                                         ),
                                         companion_core::geometry::Placement::Hidden
                                     );
+                                    if !was_safe
+                                        && p.geometry
+                                        && state.phase == Phase::Preparing
+                                        && state.target.as_ref() == Some(&h)
+                                    {
+                                        // Metadata may invalidate the candidate between Prepare
+                                        // and Prepared. Replay the already committed preparation
+                                        // once safe geometry returns; Prepared still checks the
+                                        // exact target/epoch and current geometry before revoking.
+                                        p.queue(&Reply::Prepare { epoch: state.epoch })?;
+                                    }
                                 }
                                 None
                             }
@@ -1171,21 +1505,39 @@ fn run() -> io::Result<()> {
                                     })?;
                                     continue;
                                 }
+                                let registered_project =
+                                    match task_authority.project_for(&h, &task_id) {
+                                        Ok(project) => project,
+                                        Err(reason) => {
+                                            p.queue(&Reply::OperationError {
+                                                operation: "task_observation".into(),
+                                                reason,
+                                            })?;
+                                            continue;
+                                        }
+                                    };
 
-                                if p.task.as_ref().is_some_and(|(id, r, _)| {
-                                    *id == task_id && context_revision < *r
-                                }) {
-                                    p.queue(&Reply::OperationError {
+                                match p.tasks.observe(task_id.clone(), context_revision, status) {
+                                    Err(reason) => p.queue(&Reply::OperationError {
                                         operation: "task".into(),
-                                        reason: "stale_task".into(),
-                                    })?;
-                                } else {
-                                    if p.task.as_ref().is_none_or(|(id, rev, s)| {
-                                        id != &task_id || *rev != context_revision || *s != status
-                                    }) {
+                                        reason: reason.into(),
+                                    })?,
+                                    Ok(true) => {
                                         p.last_activity = now;
+                                        if let Err(error) = provider.ledger.record_task_result(
+                                            &h,
+                                            &task_id,
+                                            registered_project.as_deref(),
+                                            context_revision,
+                                            status,
+                                        ) {
+                                            p.queue(&Reply::OperationError {
+                                                operation: "task_history".into(),
+                                                reason: error.to_string(),
+                                            })?;
+                                        }
                                     }
-                                    p.task = Some((task_id, context_revision, status));
+                                    Ok(false) => {}
                                 }
                                 None
                             }
@@ -1205,7 +1557,10 @@ fn run() -> io::Result<()> {
                                 p.queue(&snapshot(&state, &pose))?;
                                 None
                             }
-                            Request::Hello { .. } | Request::CompositorHello { .. } => {
+                            Request::Hello { .. }
+                            | Request::CompositorHello { .. }
+                            | Request::HelloWithFeatures { .. }
+                            | Request::HostMetadata { .. } => {
                                 unreachable!()
                             }
                             Request::DesktopHello
@@ -1275,8 +1630,8 @@ fn run() -> io::Result<()> {
                         let _ = provider.cancel(&turn);
                     }
                 }
-                if p.eva.is_some() {
-                    audio.disconnect();
+                if let Some(source) = p.eva {
+                    trace_voice(debug_voice, provider.ledger.disconnect_voice(&source));
                 }
                 if let Some(h) = p.host {
                     let s = state.disconnected(&h.id);
@@ -1323,10 +1678,15 @@ fn run() -> io::Result<()> {
                 }
             }
         }
+        if provider.ledger.journal_failed() && !history_failure_reported {
+            history_failure_reported = true;
+            eprintln!("EVA dialogue history write failed; new provider turns are disabled");
+        }
         let now = start.elapsed().as_millis() as u64;
         if let Some(wanted) = state.pending_recall.clone() {
             if peers.values().any(|p| {
                 p.geometry
+                    && p.admission.admitted
                     && !p.withdrawing
                     && p.compositor == state.compositor_only
                     && p.host.as_ref() == Some(&wanted)
@@ -1342,6 +1702,7 @@ fn run() -> io::Result<()> {
                     .values()
                     .find(|p| {
                         !p.withdrawing
+                            && p.admission.admitted
                             && p.compositor == state.compositor_only
                             && p.geometry
                             && p.focused
@@ -1359,6 +1720,9 @@ fn run() -> io::Result<()> {
         }
         if now.saturating_sub(last_tick) >= 100 {
             last_tick = now;
+            let (listening, playing) = companion_voice::boottime_ns()
+                .map(|now| provider.ledger.voice_facts(now))
+                .unwrap_or((false, false));
             let owner = state.possible_body.as_ref().and_then(|t| {
                 peers
                     .values()
@@ -1368,7 +1732,8 @@ fn run() -> io::Result<()> {
                 quiet: state.quiet,
                 idle_since: owner.map(|p| p.last_activity).unwrap_or(now),
                 work_event: owner.and_then(|p| {
-                    p.task.as_ref().map(|(id, rev, _)| {
+                    p.tasks.current(p.context.as_ref()).map(|(id, fact)| {
+                        let rev = fact.revision;
                         format!(
                             "{}:{id}:{rev}",
                             p.host.as_ref().map(|h| h.id.as_str()).unwrap_or("")
@@ -1377,8 +1742,8 @@ fn run() -> io::Result<()> {
                 }),
                 locked: state.locked,
                 work: owner
-                    .and_then(|p| p.task.as_ref())
-                    .map(|(_, _, s)| match s {
+                    .and_then(|p| p.tasks.current(p.context.as_ref()))
+                    .map(|(_, fact)| match fact.status {
                         TaskStatus::Running => Work::Running,
                         TaskStatus::NeedsReview => Work::NeedsReview,
                         TaskStatus::Succeeded => Work::Succeeded,
@@ -1386,8 +1751,8 @@ fn run() -> io::Result<()> {
                         TaskStatus::Unknown => Work::Unknown,
                     })
                     .unwrap_or(Work::Unknown),
-                listening: audio.listening,
-                playing: audio.playing,
+                listening,
+                playing,
                 hidden: state.mode == Presence::Hidden
                     || (state.desktop_observed && !state.desktop_known),
                 input: owner.is_some_and(|p| p.input),
@@ -1468,87 +1833,13 @@ fn load_provider(dir: &std::path::Path) -> (providers::Service, Option<String>) 
         ),
     }
 }
-#[derive(Default)]
-struct AudioTracker {
-    turn: Option<String>,
-    finished: HashSet<String>,
-    generated: u64,
-    played: u64,
-    listening: bool,
-    playing: bool,
-}
-impl AudioTracker {
-    fn disconnect(&mut self) {
-        if let Some(t) = self.turn.take() {
-            self.finished.insert(t);
+/// Explicit metadata-only diagnostics; never emits PCM, transcript, model input,
+/// task data, credentials or desktop action permissions.
+fn trace_voice(enabled: bool, record: Option<serde_json::Value>) {
+    if enabled {
+        if let Some(record) = record {
+            eprintln!("EVA voice ledger {record}");
         }
-        self.listening = false;
-        self.playing = false;
-        self.generated = 0;
-        self.played = 0;
-    }
-    fn observe(
-        &mut self,
-        t: String,
-        s: AudioState,
-        g: u64,
-        p: Option<u64>,
-        interrupted: bool,
-    ) -> Result<(), String> {
-        if self.finished.contains(&t) || self.finished.len() > 4096 {
-            return Err("audio_turn_replay_or_limit".into());
-        }
-        if self.turn.as_ref() != Some(&t) {
-            self.disconnect();
-            self.turn = Some(t.clone());
-        }
-        if g < self.generated || p.is_some_and(|p| p < self.played || p > g) {
-            return Err("audio_counter_regression".into());
-        }
-        self.generated = g;
-        if let Some(p) = p {
-            self.played = p;
-        }
-        self.listening = s == AudioState::Listening && !interrupted;
-        self.playing = s == AudioState::Speaking && p.is_some_and(|p| p > 0) && !interrupted;
-        if matches!(s, AudioState::Stopped | AudioState::Error) || interrupted {
-            self.disconnect();
-        }
-        Ok(())
-    }
-}
-#[cfg(test)]
-mod audio_tests {
-    use super::*;
-    #[test]
-    fn generated_is_not_played() {
-        let mut a = AudioTracker::default();
-        a.observe("t".into(), AudioState::Speaking, 100, None, false)
-            .unwrap();
-        assert!(!a.playing);
-        a.observe("t".into(), AudioState::Speaking, 100, Some(20), false)
-            .unwrap();
-        assert!(a.playing);
-        a.disconnect();
-        assert!(!a.playing);
-        assert!(a
-            .observe("t".into(), AudioState::Speaking, 100, Some(20), false)
-            .is_err());
-    }
-    #[test]
-    fn audio_counter_regression_and_interruption() {
-        let mut a = AudioTracker::default();
-        a.observe("t".into(), AudioState::Listening, 0, None, false)
-            .unwrap();
-        assert!(a.listening);
-        a.observe("t".into(), AudioState::Speaking, 100, Some(30), false)
-            .unwrap();
-        assert!(a
-            .observe("t".into(), AudioState::Speaking, 100, Some(20), false)
-            .is_err());
-        a.observe("t".into(), AudioState::Cancelling, 100, Some(30), true)
-            .unwrap();
-        assert!(!a.playing && !a.listening);
     }
 }
 #[cfg(test)]

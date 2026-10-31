@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Producer-confirmed and paced native X11/JWM frame feedback. This scoped matrix passes; full proposal/release, continuous/physical scanout and other-platform acceptance remain incomplete.",
+  "implemented": [
+    "Native Vulkan feature discovery/enabling, exact nonzero present IDs and bounded vkWaitForPresentKHR observation; unknown/unsupported/error/timeout never succeed.",
+    "Owner-bound extended X11 counters, original UI pass/snapshot metadata and paired known Drawn/Timing receipts.",
+    "One evidence frame per window; defer native redraw without consuming queued input/deltas, release unknown pairs without proof, invalidate on resize/owner transition.",
+    "Window-scoped captured Iced callbacks; monotonic serials and lease identity prevent stale registration callbacks/drop from adopting or removing a replacement.",
+    "Replaced obsolete submit-hook source-text assertions with production-source state tests and actual native matrix; focused CI added."
+  ],
+  "binaries_sha256": {
+    "jcompaniond": "5797ac91cccfdeb81f1aba495c1898f7525075e80326f84ab2df31216f9282ae",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "461bca4f0866e328961838b4a8b7dfe6a1ff53347ef31528d8d75885975ed5db",
+    "frost": "acdf00ef6e177900b4d4e26fe937f1410232c2636143f6376c8dfeeccadfede0",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "final_builds": "frame-feedback-checks-2026-10-31/final-build-checks.json",
+  "native_harness": {
+    "ember": {
+      "passed": 4,
+      "failed": 0
+    },
+    "frost": {
+      "passed": 6,
+      "failed": 0
+    },
+    "strict_clippy": "both passed",
+    "format": "both passed",
+    "scope": "Exact production receipt/scope source with a transport/type shim; Frost also compiles its actual observer. No GPU/scene proof is simulated by these tests."
+  },
+  "frost_eva_tests": {
+    "passed": 11,
+    "failed": 0,
+    "log": "frame-feedback-checks-2026-10-31/frost-eva-tests.txt"
+  },
+  "remote_ci": "not run; independent focused jobs added in both frontend repositories",
+  "prior_unpaced_attempt": {
+    "passed": false,
+    "report": "native-matrix-unpaced-publication-2026-10-31/matrix-report.json",
+    "finding": "Ember clearance remained awaiting_removal_proof while fresh counters kept superseding scene submissions; no replacement was allowed."
+  },
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-published-paced-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "verified_native_pid_markers": 72,
+    "host_identities_and_connections": 8,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "stopped_owner_seconds": 4,
+    "stopped_owner_blocked": true,
+    "root_image_samples": 70,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 12,
+        "native_published": 12,
+        "scene_accepted": 12
+      },
+      "ember-2": {
+        "vulkan_completed": 6,
+        "native_published": 6,
+        "scene_accepted": 6
+      },
+      "frost-1": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      },
+      "frost-2": {
+        "vulkan_completed": 5,
+        "native_published": 5,
+        "scene_accepted": 5
+      }
+    },
+    "original_failed_dual_body_evidence_preserved": "native-matrix-after-fairness-2026-10-31/023-waiting-ember-2.png"
+  },
+  "final_native_fault_cases": [
+    {
+      "case": "ember-forge",
+      "passed": true,
+      "report": "native-published-ember-forge-2026-10-31/report.json",
+      "freeze_owner_and_restart_daemon": true
+    },
+    {
+      "case": "frost-forge",
+      "passed": true,
+      "report": "native-published-frost-forge-2026-10-31/report.json",
+      "freeze_owner_and_restart_daemon": true
+    },
+    {
+      "case": "unsupported-publisher",
+      "expected_blocking_observed": true,
+      "raw_passed": false,
+      "report": "native-unsupported-publisher-2026-10-31/report.json",
+      "override": {
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/lvp_icd.json",
+        "WGPU_BACKEND": "vulkan"
+      },
+      "finding": "Actual Ember body, then retained old-owner awaiting_removal_proof; no Vulkan/native publication receipt or Forge replacement. Raw verdict unchanged."
+    }
+  ],
+  "case_expectation_checks": "frame-feedback-checks-2026-10-31/native-case-checks.json",
+  "source_files_sha256": {
+    "ember/Cargo.toml": "14756803c05fc5cda49c9f4c911ecd4955593dedecaa7122a2db09ea3258040c",
+    "ember/Cargo.lock": "16836fd4df7ffff789d4b94c0b27bf6c1a5c4a91f60a220df6694a9998d7adf2",
+    "ember/src/eva_companion.rs": "904df50d0f078774c88fe148e56c6e64cd4184b6aa7c43a43716b9de866fa489",
+    "ember/src/main.rs": "cb073dfd0341c2273314512636c5fcf28a9d39ab2f61a10aaa8114fe5f25e324",
+    "ember/vendor/wgpu-hal/src/vulkan/adapter.rs": "6bfda11c8237d65992606e559edfec2446aa1e7dc72698e00bfb9f0a17c96ea0",
+    "ember/vendor/wgpu-hal/src/vulkan/swapchain/native.rs": "a62e051453bbc9b89810f7fca7e136c716f85d6371ab8e14745907064b1ba065",
+    "ember/vendor/wgpu-hal/src/vulkan/publication.rs": "42f840dfd78b3f96ae00cf6e1aa8054a350f95682afef35f1d1b0886906a3920",
+    "ember/vendor/eframe/src/native/wgpu_integration.rs": "4a0f01315111fd54d7a7a4b4180945810644b33a97458829db217cd2ab3de0cb",
+    "ember/vendor/egui-wgpu/src/winit.rs": "eba0cc0a9d569157e58f93ec5e1fd86b97562bf3f3fdfcfa61bb1f2d964a9e46",
+    "ember/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "c5722f63a3df97bb912abe347ec1ac9bd5030a838555c95ab2e31c6d1bef29fe",
+    "frost/Cargo.toml": "0917e46af4f6ee2823ee45eb8f2dd32a9802dceb4ea53395a98966dac09e8452",
+    "frost/Cargo.lock": "6957220c4e55470e60891f9ad105527ffbd23eb5c6c4d8edab09cd6f2495fcb6",
+    "frost/src/eva_companion.rs": "ceed7c677f1a5022ca1cc0b99e8bd384cbd7fe2ee105b0931c18a9075e3bc36f",
+    "frost/vendor/wgpu-hal/src/vulkan/adapter.rs": "719b2af6016a69841cd355e547c5f6afce387b52be10fa5cdb1c313d789e5169",
+    "frost/vendor/wgpu-hal/src/vulkan/mod.rs": "93ae9d56d4eba73a2855e0362c27dc6321fcaeb52e7f2709053202b42a2d78f9",
+    "frost/vendor/wgpu-hal/src/vulkan/publication.rs": "42f840dfd78b3f96ae00cf6e1aa8054a350f95682afef35f1d1b0886906a3920",
+    "frost/vendor/iced_winit/src/lib.rs": "94d1ac109243bb992ae8ef40b0bf046f09411cc014f4b72302636752401774b2",
+    "frost/vendor/iced_winit/src/presentation_observer.rs": "e454279c242a302ded37503191366713aad1d4e35f15bc63d797f42b8531ba58",
+    "frost/vendor/winit/src/platform_impl/linux/x11/frame_feedback.rs": "c5722f63a3df97bb912abe347ec1ac9bd5030a838555c95ab2e31c6d1bef29fe",
+    "jcompanion/tests/native_windows.py": "aa26f140507dde093a6fd47563ca78ba5f0993964bf52ecd5d7d3d652774a63e",
+    "jcompanion/tests/native_matrix.py": "65599b71d71294bcf418dcf67dffe1c15064611fcf415e1a59a98a5095bb11b9",
+    "jwm/src/backend/x11/compositor/frame_sync.rs": "e79f48c31b4d3b60b2052cf64d30e2fac76e5090f906b870fdfbb941c73be31f",
+    "jwm/src/backend/x11/compositor/render.rs": "c7c8a1601486f983e2a4525fd171bd080012d2a71929f25a14e100e058d04a3b"
+  },
+  "cleanup": "Verified no processes with any of the eight owned runtime directories in /proc after all native cases exited.",
+  "limits": [
+    "PNG sampling/default-Cat classification is not continuous or physical uniqueness and zero detected ink is not proof of absence.",
+    "Capture and journal reads are not atomic; timings here are not transfer-latency/performance measurements.",
+    "NativePresented remains distinct from authenticated CompositorPresented; the stronger daemon mode still rejects these hosts.",
+    "Only supported Vulkan with opt-in JWM/X11 is accepted here. Glow/Wayland/other compositors and drivers, true IME/selection/scroll, compositor restart, close/crash/suspend, voice/API, full memory/task UI and release/performance remain pending.",
+    "The earlier two Ember UI baseline assertion failures remain recorded; no full frontend suite or remote CI pass is claimed."
+  ],
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-published-461bca4-acdf00e"
+}

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "scope": "Successful source builds, not device/API/performance acceptance",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "builds": {
+    "jcompaniond": {
+      "binary": "/home/yj/projects/jcompanion/target/debug/jcompaniond",
+      "sha256": "5797ac91cccfdeb81f1aba495c1898f7525075e80326f84ab2df31216f9282ae",
+      "source_base": "9aa569540091524d637a7115b64c587b9177a55b"
+    },
+    "forge": {
+      "binary": "/tmp/eva-native-target/debug/forge",
+      "sha256": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+      "source_base": "58495ae55fafbd30c5998d936e5014aef8671910"
+    },
+    "anvil": {
+      "binary": "/tmp/eva-native-target/debug/anvil",
+      "sha256": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+      "source_base": "d76a33a300d10055fa89d370335c43fb2b03c729"
+    },
+    "ember": {
+      "binary": "/tmp/eva-egui-target/debug/ember",
+      "sha256": "b33ecbcd4b44ca8967371db3fe5dab5e4b927a85431a0470b22e5d9cc5b7bd33",
+      "source_base": "c21dbf62d908ba869a97b9d1d4beace7faefc7bf"
+    },
+    "frost": {
+      "binary": "/tmp/eva-egui-target/debug/frost",
+      "sha256": "dd5206a492f064cda34597e9eed39bc6eccb061e2998a0b48361e2a8cbac3f7a",
+      "source_base": "cdaa2a966de6c8cf8bfd90809397b8660b7f6ed6"
+    }
+  },
+  "coordinator_modified": true,
+  "frost_notes": "Two existing iced_winit deprecated try_next warnings; build succeeded."
+}

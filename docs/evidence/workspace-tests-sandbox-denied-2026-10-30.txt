@@ -1,0 +1,36 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/lib.rs (target/debug/deps/companion_client-3331c56e4e600b5f)
+
+running 4 tests
+test tests::backpressure_preserves_control ... ok
+test tests::framed_roundtrip ... FAILED
+test eof_tests::complete_final_frame_survives_eof ... FAILED
+test handshake_tests::early_controls_wait_for_accepted_boot ... FAILED
+
+failures:
+
+---- tests::framed_roundtrip stdout ----
+
+thread 'tests::framed_roundtrip' (22) panicked at crates/companion-client/src/lib.rs:381:19:
+called `Result::unwrap()` on an `Err` value: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" }
+
+---- eof_tests::complete_final_frame_survives_eof stdout ----
+
+thread 'eof_tests::complete_final_frame_survives_eof' (19) panicked at crates/companion-client/src/lib.rs:454:19:
+called `Result::unwrap()` on an `Err` value: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- handshake_tests::early_controls_wait_for_accepted_boot stdout ----
+
+thread 'handshake_tests::early_controls_wait_for_accepted_boot' (20) panicked at crates/companion-client/src/lib.rs:411:10:
+called `Result::unwrap()` on an `Err` value: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" }
+
+
+failures:
+    eof_tests::complete_final_frame_survives_eof
+    handshake_tests::early_controls_wait_for_accepted_boot
+    tests::framed_roundtrip
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p companion-client --lib`

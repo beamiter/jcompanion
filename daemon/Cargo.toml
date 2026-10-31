@@ -14,3 +14,5 @@ companion-client.workspace = true
 companion-memory = { path = "../crates/companion-memory" }
 companion-openai = { path = "../crates/companion-openai" }
 sha2 = "0.10"
+
+companion-voice = { path = "../crates/companion-voice" }

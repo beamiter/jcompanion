@@ -193,6 +193,27 @@ impl Client {
         c.send(Request::CompositorHello { host })?;
         Ok(c)
     }
+    /// Explicit feature negotiation; legacy callers continue to use `connect`.
+    pub fn connect_with_features(
+        path: impl AsRef<Path>,
+        session: impl Into<String>,
+        host: Host,
+        features: Vec<HostFeature>,
+    ) -> io::Result<Self> {
+        let mut client = Self {
+            pending_control: VecDeque::new(),
+            pending_geometry: None,
+            pending_focus: None,
+            io: Framed::new(connect_checked(path.as_ref())?)?,
+            host: host.clone(),
+            session: session.into(),
+            boot: String::new(),
+            seq: 0,
+            connected: true,
+        };
+        client.send(Request::HelloWithFeatures { host, features })?;
+        Ok(client)
+    }
     pub fn connect_desktop(
         path: impl AsRef<Path>,
         session: impl Into<String>,
@@ -246,6 +267,7 @@ impl Client {
             && !matches!(
                 body,
                 Request::Hello { .. }
+                    | Request::HelloWithFeatures { .. }
                     | Request::DesktopHello
                     | Request::EvaHello
                     | Request::CompositorHello { .. }
@@ -323,6 +345,11 @@ impl Client {
             for b in self.io.read()? {
                 let r: Reply = serde_json::from_slice(&b).map_err(|_| invalid("invalid_reply"))?;
                 if let Reply::Accepted {
+                    boot_id,
+                    session_id,
+                    ..
+                }
+                | Reply::HostAccepted {
                     boot_id,
                     session_id,
                     ..

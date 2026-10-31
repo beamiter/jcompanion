@@ -1,0 +1,386 @@
+{
+  "schema": 1,
+  "date": "2026-10-31",
+  "overall_goal_complete": false,
+  "changes_uncommitted": true,
+  "scope": "Private Vulkan/JWM/X11 actual explicit-argv command-owned PTY role admission, real existing CLI/task-worktree UI launch, native tab confirmation and full family matrix. Controlled codex/opencode executables are only process fixtures; no actual provider, model or task outcome is claimed. No synthetic residence/native proof is injected.",
+  "implemented": [
+    "Ember uses its authoritative SessionPurpose: explicit-argv EphemeralCommand roots are live work even when child PID equals PTY foreground PGID. Ordinary interactive shells and genuinely exited/retained command transcripts keep their separate close behavior.",
+    "Frost records command_owned from explicit spawn argv. Both whole-window admission and existing tab/batch close confirmation use current kernel PTY ownership and this role, rather than the cached display process name. Unknown live terminals remain protected.",
+    "The native fixture exercises the existing Frost coding-CLI palette and Ember actual task composer/isolated Git worktree/start UI, with private controlled CLI executables and kernel PID/PPID/session/TTY ownership. Background tests additionally execute native input in the exact original shell; tab cancellation and explicit confirmation preserve existing user intent."
+  ],
+  "binary_sha256": {
+    "jcompaniond": "47c6be46af524adaca9e96d76953ca9cba31e78b73738a9be26bb9b979a2633f",
+    "forge": "60a3c8f75fdeb19b2f93f22d5220d46a44573b791cb9d839a8c52ba067f8f080",
+    "anvil": "c4e6df1fde8209d920b2983abbedffe527b2ea4b660ca9f8cd32731ad72b4bba",
+    "ember": "9e07fd05690926922a902c72232b4cff6f840a9e28e04a9410ba1bde412bd3bc",
+    "frost": "f0eeef951aa263924be667f28474dc7c8789d2c0afaaca3cac84f9bde064a2d5",
+    "jwm": "883504da9ba7bc6f8884c892c9ddffee1d5d9c7e8afbc828cc1da18d8ec61894",
+    "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+  },
+  "command_role_cases": {
+    "ember-owned-command": {
+      "passed": true,
+      "report": "native-command-role-ember-owned-command-2026-10-31/command-role-report.json",
+      "root_samples": 18,
+      "controlled_cli_only": true,
+      "actual_task_worktree_created": true,
+      "native_shell_pid_verified": false,
+      "native_tab_confirmation": false
+    },
+    "frost-owned-command": {
+      "passed": true,
+      "report": "native-command-role-frost-owned-command-2026-10-31/command-role-report.json",
+      "root_samples": 22,
+      "controlled_cli_only": true,
+      "actual_task_worktree_created": false,
+      "native_shell_pid_verified": false,
+      "native_tab_confirmation": false
+    },
+    "ember-owned-command-background": {
+      "passed": true,
+      "report": "native-command-role-ember-owned-command-background-2026-10-31/command-role-report.json",
+      "root_samples": 18,
+      "controlled_cli_only": true,
+      "actual_task_worktree_created": true,
+      "native_shell_pid_verified": true,
+      "native_tab_confirmation": false
+    },
+    "frost-owned-command-background": {
+      "passed": true,
+      "report": "native-command-role-frost-owned-command-background-2026-10-31/command-role-report.json",
+      "root_samples": 19,
+      "controlled_cli_only": true,
+      "actual_task_worktree_created": false,
+      "native_shell_pid_verified": true,
+      "native_tab_confirmation": false
+    },
+    "frost-owned-command-tab": {
+      "passed": true,
+      "report": "native-command-role-frost-owned-command-tab-2026-10-31/command-role-report.json",
+      "root_samples": 22,
+      "controlled_cli_only": true,
+      "actual_task_worktree_created": false,
+      "native_shell_pid_verified": false,
+      "native_tab_confirmation": true
+    }
+  },
+  "close_intent_cases": {
+    "frost-late-job": {
+      "passed": true,
+      "report": "native-command-regression-frost-late-job-2026-10-31/close-intent-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false
+    },
+    "ember-late-job": {
+      "passed": true,
+      "report": "native-command-regression-ember-late-job-2026-10-31/close-intent-report.json",
+      "root_samples": 11,
+      "same_final_binary_reuse": false
+    },
+    "frost-late-final-tab": {
+      "passed": true,
+      "report": "native-command-regression-frost-late-final-tab-2026-10-31/close-intent-report.json",
+      "root_samples": 17,
+      "same_final_binary_reuse": false
+    },
+    "ember-embedded-editor-exit": {
+      "passed": true,
+      "report": "native-command-regression-ember-embedded-editor-exit-2026-10-31/close-intent-report.json",
+      "root_samples": 10,
+      "same_final_binary_reuse": false
+    },
+    "ember-embedded-save": {
+      "passed": true,
+      "report": "native-command-regression-ember-embedded-save-2026-10-31/close-intent-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false
+    }
+  },
+  "window_use_cases": {
+    "ember-busy": {
+      "passed": true,
+      "report": "native-command-regression-ember-busy-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-busy": {
+      "passed": true,
+      "report": "native-command-regression-frost-busy-2026-10-31/window-use-report.json",
+      "root_samples": 18,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-busy-background": {
+      "passed": true,
+      "report": "native-command-regression-frost-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 17,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-busy-background": {
+      "passed": true,
+      "report": "native-command-regression-ember-busy-background-2026-10-31/window-use-report.json",
+      "root_samples": 16,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-external-vim": {
+      "passed": true,
+      "report": "native-command-regression-frost-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 19,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "ember-external-vim": {
+      "passed": true,
+      "report": "native-command-regression-ember-external-vim-2026-10-31/window-use-report.json",
+      "root_samples": 15,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": true
+    },
+    "frost-mapped-resize": {
+      "passed": true,
+      "report": "native-command-regression-frost-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 19,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": false
+    },
+    "ember-mapped-resize": {
+      "passed": true,
+      "report": "native-command-regression-ember-mapped-resize-2026-10-31/window-use-report.json",
+      "root_samples": 14,
+      "same_final_binary_reuse": false,
+      "fresh_native_prompt_after_work": false
+    }
+  },
+  "surface_regression": {
+    "frost-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-frost-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 15
+    },
+    "ember-surface-remap": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-ember-surface-remap-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "frost-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-frost-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 17
+    },
+    "ember-surface-resize": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-ember-surface-resize-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "frost-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-frost-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 11
+    },
+    "ember-surface-close": {
+      "passed": true,
+      "expected_negative": false,
+      "report": "native-command-regression-ember-surface-close-2026-10-31/surface-report.json",
+      "root_samples": 8
+    },
+    "frost-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-command-regression-frost-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 14
+    },
+    "ember-surface-crash": {
+      "passed": true,
+      "expected_negative": true,
+      "report": "native-command-regression-ember-surface-crash-2026-10-31/surface-report.json",
+      "root_samples": 13
+    }
+  },
+  "authority_regression": {
+    "frost-authority": {
+      "passed": true,
+      "report": "native-command-regression-frost-authority-2026-10-31/lifecycle-report.json"
+    },
+    "ember-authority": {
+      "passed": true,
+      "report": "native-command-regression-ember-authority-2026-10-31/lifecycle-report.json"
+    }
+  },
+  "historical": [
+    {
+      "report": "native-command-history-frost-before-2026-10-31/command-role-report.json",
+      "raw_passed": false,
+      "finding": "Old Frost ordinary WM close exited its GUI while the real command root itself owned foreground. This is a real regression baseline."
+    },
+    {
+      "report": "native-command-history-ember-before-2026-10-31/command-role-report.json",
+      "raw_passed": false,
+      "finding": "Old Ember ordinary WM close terminated actual command-owned PTY work launched by its real task composer/worktree. This is a real regression baseline."
+    },
+    {
+      "report": "native-command-history-ember-profile-attempt-2026-10-31/command-role-report.json",
+      "raw_passed": false,
+      "finding": "The first automated profile omitted AI flags when absent, so the task Start gate remained disabled. No controlled command marker arrived; this is a fixture setup failure, not a product regression."
+    },
+    {
+      "report": "native-command-history-ember-ui-probe-2026-10-31/command-role-report.json",
+      "raw_passed": false,
+      "finding": "Exploratory UI session learned the task composer/start path. Explicit passed=false/acceptance_claimed=false is preserved; its cleanup signal is not a close-regression result."
+    },
+    {
+      "report": "native-command-history-initial-ember-owned-command-2026-10-31/command-role-report.json",
+      "raw_passed": true,
+      "finding": "Initial same-binary positive case. Background variants only issued a tab shortcut without a native shell PID marker; final acceptance repeats every role case and adds the exact native shell marker to both background cases."
+    },
+    {
+      "report": "native-command-history-initial-frost-owned-command-2026-10-31/command-role-report.json",
+      "raw_passed": true,
+      "finding": "Initial same-binary positive case. Background variants only issued a tab shortcut without a native shell PID marker; final acceptance repeats every role case and adds the exact native shell marker to both background cases."
+    },
+    {
+      "report": "native-command-history-initial-ember-owned-command-background-2026-10-31/command-role-report.json",
+      "raw_passed": true,
+      "finding": "Initial same-binary positive case. Background variants only issued a tab shortcut without a native shell PID marker; final acceptance repeats every role case and adds the exact native shell marker to both background cases."
+    },
+    {
+      "report": "native-command-history-initial-frost-owned-command-background-2026-10-31/command-role-report.json",
+      "raw_passed": true,
+      "finding": "Initial same-binary positive case. Background variants only issued a tab shortcut without a native shell PID marker; final acceptance repeats every role case and adds the exact native shell marker to both background cases."
+    },
+    {
+      "report": "native-command-history-initial-frost-owned-command-tab-2026-10-31/command-role-report.json",
+      "raw_passed": true,
+      "finding": "Initial same-binary positive case. Background variants only issued a tab shortcut without a native shell PID marker; final acceptance repeats every role case and adds the exact native shell marker to both background cases."
+    }
+  ],
+  "targeted_tests": {
+    "ember_eva": 2,
+    "ember_window": 6,
+    "frost_eva": 11,
+    "frost_close": 69
+  },
+  "unchanged_checks_reused": {
+    "schema": 1,
+    "passed": true,
+    "previous_inventory_sha256": "25a670e7fe3337c7f96e80e08e7d19e0abd72387961b131a45e3e16806b08e63",
+    "unchanged_files_verified": 8745,
+    "changed_previous_inventory_files": [
+      "ember/src/app/window.rs",
+      "frost/src/eva_companion.rs",
+      "frost/src/main.rs"
+    ],
+    "coordinator_compile_inputs": 28,
+    "coordinator_binary_sha256": "47c6be46af524adaca9e96d76953ca9cba31e78b73738a9be26bb9b979a2633f",
+    "coordinator_workspace_tests_reused": 77,
+    "real_ipc_contracts_reused": 7,
+    "jwm_files_verified": 1809,
+    "receipt_harness_reused": {
+      "ember": 7,
+      "frost": 9
+    },
+    "egui_winit_tests_reused": 8,
+    "scope": "Exact previous inventory hashes match across coordinator, JWM, all receipt harness compile inputs and key code. Frost Eva adapter differs only by rustfmt whitespace and its 11 focused tests were rerun; changed close functions have current real-PTY/native tests. Reuse does not claim rerunning the unchanged suites."
+  },
+  "frontend_builds": "Both final locked/offline builds passed; recorded Rust/Cargo input hashes unchanged during builds and at evidence collection. Rustfmt also reformatted only whitespace in Frost Eva adapter; its 11 focused tests were rerun. Existing dependency warnings remain; full frontend Clippy is not claimed.",
+  "native_matrix": {
+    "passed": true,
+    "report": "native-matrix-command-role-final-2026-10-31/matrix-report.json",
+    "gui_processes": 8,
+    "distinct_ptys": 32,
+    "native_pid_markers": 72,
+    "rapid_focus_events": 24,
+    "full_reverse_traversal": true,
+    "root_samples": 77,
+    "max_detected_body_windows": 1,
+    "desktop_shell_load": true,
+    "wgpu_feedback": {
+      "ember-1": {
+        "vulkan_completed": 9,
+        "native_published": 9,
+        "scene_accepted": 9
+      },
+      "ember-2": {
+        "vulkan_completed": 6,
+        "native_published": 6,
+        "scene_accepted": 6
+      },
+      "frost-1": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      },
+      "frost-2": {
+        "vulkan_completed": 4,
+        "native_published": 4,
+        "scene_accepted": 4
+      }
+    }
+  },
+  "cleanup": {
+    "owned_runtime_roots": [
+      "/tmp/eva-native-0k3ifue2",
+      "/tmp/eva-native-1egajfvj",
+      "/tmp/eva-native-233idc3n",
+      "/tmp/eva-native-2986jmpl",
+      "/tmp/eva-native-31qd6m28",
+      "/tmp/eva-native-3f2cpe9s",
+      "/tmp/eva-native-3hg_tx46",
+      "/tmp/eva-native-4k1fz0h4",
+      "/tmp/eva-native-4rtwvr82",
+      "/tmp/eva-native-67ca262b",
+      "/tmp/eva-native-6aj19fde",
+      "/tmp/eva-native-6etuf_bp",
+      "/tmp/eva-native-6yq17atj",
+      "/tmp/eva-native-_6i2q20w",
+      "/tmp/eva-native-f61ugiel",
+      "/tmp/eva-native-f_9ck09h",
+      "/tmp/eva-native-fl0pbque",
+      "/tmp/eva-native-gnr6707i",
+      "/tmp/eva-native-hi2dy1oo",
+      "/tmp/eva-native-kzemxlrl",
+      "/tmp/eva-native-mcyw1yzp",
+      "/tmp/eva-native-muqnfagy",
+      "/tmp/eva-native-n2i36kao",
+      "/tmp/eva-native-nv0cz8l8",
+      "/tmp/eva-native-opdi9le_",
+      "/tmp/eva-native-pt0pi400",
+      "/tmp/eva-native-pwcrnh13",
+      "/tmp/eva-native-qvy0yqhb",
+      "/tmp/eva-native-rlucqai2",
+      "/tmp/eva-native-tjtgimbz",
+      "/tmp/eva-native-u4kp6t5a",
+      "/tmp/eva-native-ui7xobjx",
+      "/tmp/eva-native-unl4py6d",
+      "/tmp/eva-native-v34ef582",
+      "/tmp/eva-native-v58xokbo",
+      "/tmp/eva-native-vuus1q38",
+      "/tmp/eva-native-y4insnwt",
+      "/tmp/eva-native-zh099ors"
+    ],
+    "remaining_processes": []
+  },
+  "durable_local_snapshot": "/home/yj/projects/eva-companion-acceptance/2026-10-31/native-command-role-9e07fd0-f0eeef9",
+  "source_files_sha256": {
+    "jcompanion/tests/native_command_role.py": "c02d94872eeec42c18b21d58cd45f7c92655027301b02b328162b034edc68cdd",
+    "ember/src/app/window.rs": "c65b02ac7af9ce9ab1855d160be35be1f6a529cd009671300f251072302cc0dd",
+    "frost/src/main.rs": "d3382bb6af2a6485bef51093ff6eb107f7f9bdab7120ed9edc259ba5bdfad82c",
+    "frost/src/eva_companion.rs": "33b6a0f805ed690642389ec46aa7db6e5db4a79ce9a773b19cf67df163dd3855"
+  },
+  "remote_ci": "Not run; native tests are local isolated acceptance.",
+  "limits": [
+    "Real Codex/OpenCode/jagent execution, provider semantics, API/model usage and remote sessions are not accepted by a controlled CLI process fixture. Shell builtins/exec and more child/remote lifecycle roles need separate acceptance.",
+    "A paused close still keeps its already-started withdrawal. Safe explicit cancel/resumed admission with the same host identity remains to implement; old-token proof cannot be discarded or replaced by reconnect/new identity.",
+    "Other frontends embedded Vim9, same-process native windows, suspend/resume, IME/selection/scroll, voice/API, trusted single-node fences/anchors, other backends/drivers and full release/performance remain open. The two known Ember UI baseline failures remain recorded.",
+    "SIGKILL remains recovery_blocked without trusted destruction proof. No automatic crash recovery, CompositorPresented, physical/continuous uniqueness or performance claim is made."
+  ],
+  "visual_review": "command-role-checks-2026-10-31/visual-review.json"
+}
