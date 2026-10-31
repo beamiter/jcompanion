@@ -145,6 +145,57 @@ fn follows(previous: &[Record], incoming: &Record) -> bool {
 }
 
 impl Journal {
+    /// Counts recorded references for one original voice turn. A registered
+    /// operation without a settled receipt stays Unknown, never complete.
+    pub fn receipts(
+        &self,
+        boot: &str,
+        source: &str,
+        session: &str,
+        turn: &str,
+    ) -> Option<companion_protocol::history::Receipts> {
+        let row = self.document.turns.iter().find(|row| {
+            row.boot_id == boot
+                && row.source_id == source
+                && row.voice_session_id == session
+                && row.turn_id == turn
+        })?;
+        let mut receipts = companion_protocol::history::Receipts::default();
+        let mut operations = std::collections::BTreeMap::<&str, Outcome>::new();
+        for record in &row.events {
+            match &record.event {
+                Event::ToolCall { .. } => receipts.tool_calls += 1,
+                Event::OperationRegistered { operation_id, .. } => {
+                    operations.entry(operation_id).or_insert(Outcome::Unknown);
+                }
+                Event::OperationSettled {
+                    operation_id,
+                    outcome,
+                    ..
+                } => {
+                    operations.insert(operation_id, *outcome);
+                }
+                Event::ToolResult {
+                    operations: reported,
+                    ..
+                } => {
+                    for operation in reported {
+                        operations.insert(&operation.operation_id, operation.outcome);
+                    }
+                }
+                _ => {}
+            }
+        }
+        for outcome in operations.values() {
+            match outcome {
+                Outcome::Succeeded => receipts.succeeded += 1,
+                Outcome::Partial => receipts.partial += 1,
+                Outcome::Failed | Outcome::Cancelled => receipts.failed_or_cancelled += 1,
+                _ => receipts.unknown += 1,
+            }
+        }
+        Some(receipts)
+    }
     pub fn memory(companion: &str) -> Self {
         Self {
             path: None,
@@ -363,6 +414,40 @@ mod tests {
                 },
             ),
         ]
+    }
+    #[test]
+    fn receipts_count_latest_outcomes_and_keep_unsettled_operations_unknown() {
+        let mut journal = Journal::memory("eva");
+        for event in &events() {
+            journal.record("voice", event).unwrap();
+        }
+        let receipts = journal
+            .receipts("memory", "voice", "activation-1", "turn-1")
+            .unwrap();
+        assert_eq!((receipts.tool_calls, receipts.unknown), (1, 1));
+        assert_eq!(receipts.succeeded + receipts.failed_or_cancelled, 0);
+        let mut settled = events()[3].clone();
+        settled.observed_at_ns = 5;
+        if let Event::ToolResult {
+            outcome,
+            operations,
+            ..
+        } = &mut settled.event
+        {
+            *outcome = Outcome::Failed;
+            operations[0].outcome = Outcome::Failed;
+        }
+        journal.record("voice", &settled).unwrap();
+        let receipts = journal
+            .receipts("memory", "voice", "activation-1", "turn-1")
+            .unwrap();
+        assert_eq!((receipts.failed_or_cancelled, receipts.unknown), (1, 0));
+        assert!(journal
+            .receipts("memory", "voice", "activation-2", "turn-1")
+            .is_none());
+        assert!(journal
+            .receipts("another-boot", "voice", "activation-1", "turn-1")
+            .is_none());
     }
     #[test]
     fn completed_call_references_and_unknown_refinement_are_required() {

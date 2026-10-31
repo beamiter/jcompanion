@@ -35,3 +35,6 @@ jobs:
       - name: Withdrawal, residence, context, memory and voice IPC contracts
         # Real coordinator, fresh offline profiles; no model/audio/display calls.
         run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/withdrawal_contracts.py --binary target/debug/jcompaniond --report target/ipc-contracts.json
+      - name: Dialogue history IPC contracts
+        # Negotiation, scope isolation, lock withdrawal, paging and restart text loss.
+        run: timeout 60s env -u SSH_CONNECTION -u SSH_TTY XDG_SESSION_ID=eva-fault-test python3 tests/history_contracts.py --binary target/debug/jcompaniond --report target/history-contracts.json

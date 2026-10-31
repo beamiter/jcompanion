@@ -121,6 +121,13 @@ fn metadata(entry: &Entry) -> Entry {
 }
 
 impl Journal {
+    /// Creation order, oldest first. Records are metadata only.
+    pub(crate) fn turns(&self) -> &[Turn] {
+        &self.document.turns
+    }
+    pub(crate) fn boot_id(&self) -> &str {
+        &self.boot_id
+    }
     /// Called while the daemon already holds the exclusive profile lock.
     /// An invalid/unreadable journal is never silently discarded or reset.
     pub fn open(dir: &Path, companion_id: &str, boot_id: &str) -> io::Result<Self> {
@@ -532,6 +539,266 @@ mod tests {
         assert_eq!(doc.results[0].project_id.as_deref(), Some("A"));
         assert_eq!(doc.results[0].status, TaskStatus::Failed);
         assert_eq!(doc.results[0].host_incarnation, 1);
+    }
+
+    fn at(host: &str, pane: &str, task: Option<&str>, project: Option<&str>) -> ContextRef {
+        ContextRef {
+            host_id: host.into(),
+            pane_id: pane.into(),
+            task_id: task.map(str::to_owned),
+            project_id: project.map(str::to_owned),
+            revision: 7,
+        }
+    }
+    fn say(ledger: &mut Ledger, id: &str, context: &ContextRef, selection: bool) {
+        let turn = companion_openai::UserTurn {
+            turn_id: id.into(),
+            context: context.clone(),
+            text: format!("input {id}"),
+            approved_selection: selection.then(|| companion_protocol::SelectionEvidence {
+                context: context.clone(),
+                text: "reviewed terminal text".into(),
+                source_event_id: "event".into(),
+                consent_id: "consent".into(),
+                captured_at_ms: 1,
+            }),
+        };
+        ledger.begin_input(&turn, Route::Offline, None).unwrap();
+        ledger.finish_output(id, &format!("reply {id}")).unwrap();
+    }
+    fn ids(page: &[companion_protocol::history::Entry]) -> Vec<&str> {
+        page.iter().map(|e| e.turn_id.as_str()).collect()
+    }
+
+    #[test]
+    fn history_scopes_never_cross_projects_tasks_or_panes() {
+        use companion_protocol::history::Scope;
+        let temp = Temp::new();
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot").unwrap();
+        let a = at("ember-1", "pane-a", Some("task-1"), Some("project-a"));
+        let same_task_other_host = at("forge-1", "pane-b", Some("task-1"), Some("project-a"));
+        let other_task = at("forge-1", "pane-c", Some("task-2"), Some("project-a"));
+        let other_project = at("forge-1", "pane-d", Some("task-1"), Some("project-b"));
+        let no_project = at("ember-1", "pane-a", None, None);
+        for (id, context) in [
+            ("a", &a),
+            ("b", &same_task_other_host),
+            ("c", &other_task),
+            ("d", &other_project),
+            ("e", &no_project),
+        ] {
+            say(&mut ledger, id, context, false);
+        }
+        let page = |context: &ContextRef, scope| ledger.history(context, scope, None);
+        assert_eq!(ids(&page(&a, Scope::Context).unwrap().0), ["a"]);
+        let mut revised = a.clone();
+        revised.revision = 99;
+        assert_eq!(ids(&page(&revised, Scope::Context).unwrap().0), ["a"]);
+        assert_eq!(ids(&page(&a, Scope::Task).unwrap().0), ["b", "a"]);
+        assert_eq!(ids(&page(&a, Scope::Project).unwrap().0), ["c", "b", "a"]);
+        assert_eq!(ids(&page(&other_project, Scope::Project).unwrap().0), ["d"]);
+        assert_eq!(ids(&page(&other_project, Scope::Task).unwrap().0), ["d"]);
+        assert_eq!(ids(&page(&no_project, Scope::Context).unwrap().0), ["e"]);
+        assert_eq!(
+            page(&no_project, Scope::Project).err(),
+            Some("scope_unavailable")
+        );
+        assert_eq!(
+            page(&no_project, Scope::Task).err(),
+            Some("scope_unavailable")
+        );
+        assert!(page(&a, Scope::Voice).unwrap().0.is_empty());
+        let shown = &page(&a, Scope::Project).unwrap().0[1];
+        assert_eq!(shown.source.as_ref(), Some(&same_task_other_host));
+        assert_eq!(shown.input.as_deref(), Some("input b"));
+    }
+
+    #[test]
+    fn history_pages_newest_first_and_reject_unknown_cursors() {
+        use companion_protocol::history::{Scope, MAX_PAGE};
+        let temp = Temp::new();
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot").unwrap();
+        let context = at("host", "pane", None, Some("project"));
+        let all: Vec<String> = (0..20).map(|n| format!("turn-{n:02}")).collect();
+        for id in &all {
+            say(&mut ledger, id, &context, false);
+        }
+        let mut seen = vec![];
+        let mut before = None;
+        let mut pages = 0;
+        loop {
+            let (page, next) = ledger
+                .history(&context, Scope::Project, before.as_deref())
+                .unwrap();
+            assert!(page.len() <= MAX_PAGE && !page.is_empty());
+            seen.extend(page.iter().map(|e| e.turn_id.clone()));
+            pages += 1;
+            match next {
+                Some(cursor) => {
+                    assert_eq!(Some(&cursor), page.last().map(|e| &e.cursor));
+                    before = Some(cursor);
+                }
+                None => break,
+            }
+        }
+        assert_eq!(pages, 3);
+        let mut newest_first = all.clone();
+        newest_first.reverse();
+        assert_eq!(seen, newest_first);
+        assert_eq!(
+            ledger
+                .history(&context, Scope::Project, Some(&"0".repeat(64)))
+                .err(),
+            Some("history_cursor_stale")
+        );
+        // A cursor from another scope is not a position in this one.
+        let elsewhere = at("host", "other-pane", None, Some("project"));
+        say(&mut ledger, "elsewhere", &elsewhere, false);
+        let foreign = ledger.history(&elsewhere, Scope::Context, None).unwrap().0[0]
+            .cursor
+            .clone();
+        assert_eq!(
+            ledger
+                .history(&context, Scope::Context, Some(&foreign))
+                .err(),
+            Some("history_cursor_stale")
+        );
+        // New turns do not shift an existing cursor.
+        let (first, next) = ledger.history(&context, Scope::Context, None).unwrap();
+        say(&mut ledger, "late", &context, false);
+        let (second, _) = ledger
+            .history(&context, Scope::Context, next.as_deref())
+            .unwrap();
+        assert_eq!(second[0].turn_id, "turn-11");
+        assert!(second
+            .iter()
+            .all(|e| first.iter().all(|f| f.cursor != e.cursor)));
+    }
+
+    #[test]
+    fn history_text_is_session_only_and_reviewed_selection_stays_with_origin() {
+        use companion_protocol::history::{Scope, Text};
+        let temp = Temp::new();
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot1").unwrap();
+        let origin = at("ember-1", "pane-a", None, Some("project"));
+        let other = at("forge-1", "pane-b", None, Some("project"));
+        say(&mut ledger, "plain", &origin, false);
+        say(&mut ledger, "selected", &origin, true);
+        let (page, _) = ledger.history(&other, Scope::Project, None).unwrap();
+        assert_eq!(page[0].turn_id, "selected");
+        assert_eq!(page[0].text, Text::WithheldOutsideOrigin);
+        assert!(page[0].input.is_none() && page[0].reply.is_none());
+        assert_eq!(page[1].text, Text::Shown);
+        assert_eq!(page[1].reply.as_deref(), Some("reply plain"));
+        let (page, _) = ledger.history(&origin, Scope::Context, None).unwrap();
+        assert_eq!(page[0].text, Text::Shown);
+        assert_eq!(page[0].input.as_deref(), Some("input selected"));
+        let serialized = serde_json::to_string(&page).unwrap();
+        assert!(!serialized.contains("reviewed terminal text"));
+        assert!(!serialized.contains("consent"));
+        drop(ledger);
+        let ledger = Ledger::open(&temp.0, "eva", "boot2").unwrap();
+        let (page, _) = ledger.history(&origin, Scope::Context, None).unwrap();
+        assert_eq!(ids(&page), ["selected", "plain"]);
+        for entry in &page {
+            assert_eq!(entry.text, Text::EarlierSession);
+            assert!(entry.input.is_none() && entry.reply.is_none());
+            assert!(entry.generated && entry.finished);
+        }
+    }
+
+    #[test]
+    fn history_page_fits_one_frame_and_marks_oversize_text() {
+        use companion_protocol::history::{Scope, Text, MAX_PAGE_BYTES};
+        let temp = Temp::new();
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot").unwrap();
+        let context = at("host", "pane", None, None);
+        for n in 0..8 {
+            let id = format!("large-{n}");
+            // Control characters expand six-fold in JSON.
+            let text = "\u{1}".repeat(8192);
+            let turn = companion_openai::UserTurn {
+                turn_id: id.clone(),
+                context: context.clone(),
+                text: text.clone(),
+                approved_selection: None,
+            };
+            ledger.begin_input(&turn, Route::Offline, None).unwrap();
+            ledger.finish_output(&id, &"x".repeat(8192)).unwrap();
+        }
+        let (page, next) = ledger.history(&context, Scope::Context, None).unwrap();
+        assert!(page
+            .iter()
+            .all(|e| e.text == Text::TooLarge && e.input.is_none()));
+        assert_eq!(page.len(), 8);
+        assert!(next.is_none());
+        let reply = companion_protocol::Reply::DialogueHistory {
+            request_id: u64::MAX,
+            context: context.clone(),
+            scope: Scope::Context,
+            status: "ok".into(),
+            entries: page,
+            next_before: None,
+        };
+        assert!(serde_json::to_vec(&reply).unwrap().len() <= companion_protocol::MAX_FRAME);
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot2").unwrap();
+        for n in 0..8 {
+            let id = format!("medium-{n}");
+            let turn = companion_openai::UserTurn {
+                turn_id: id.clone(),
+                context: context.clone(),
+                text: "m".repeat(8192),
+                approved_selection: None,
+            };
+            ledger.begin_input(&turn, Route::Offline, None).unwrap();
+            ledger.finish_output(&id, &"r".repeat(8192)).unwrap();
+        }
+        let (page, next) = ledger.history(&context, Scope::Context, None).unwrap();
+        let bytes: usize = page
+            .iter()
+            .map(|e| serde_json::to_vec(e).unwrap().len())
+            .sum();
+        assert!(bytes <= MAX_PAGE_BYTES);
+        assert!(page.len() < 8 && page.iter().all(|e| e.text == Text::Shown));
+        assert_eq!(next, page.last().map(|e| e.cursor.clone()));
+    }
+
+    #[test]
+    fn voice_history_reports_counters_without_transcripts_or_text_scopes() {
+        use companion_protocol::history::{Route as View, Scope, Text};
+        let temp = Temp::new();
+        let mut ledger = Ledger::open(&temp.0, "eva", "boot").unwrap();
+        let owner = VoiceLease {
+            source_id: "voice".into(),
+            session_id: "activation".into(),
+        };
+        ledger
+            .observe_voice(VoiceObservation {
+                companion_id: "eva",
+                owner: &owner,
+                turn_id: "spoken",
+                state: AudioState::Speaking,
+                generated_samples: 4800,
+                played_samples: Some(1200),
+                interrupted: false,
+                observed_at_ns: 1_000_000_000,
+                received_at_ns: 1_000_000_000,
+            })
+            .unwrap();
+        let context = at("host", "pane", Some("task"), Some("project"));
+        for scope in [Scope::Context, Scope::Task, Scope::Project] {
+            assert!(ledger.history(&context, scope, None).unwrap().0.is_empty());
+        }
+        let (page, _) = ledger.history(&context, Scope::Voice, None).unwrap();
+        assert_eq!(page.len(), 1);
+        let entry = &page[0];
+        assert!(entry.valid());
+        assert_eq!(entry.route, View::Voice);
+        assert_eq!(entry.text, Text::NotRecorded);
+        assert!(entry.source.is_none() && entry.input.is_none());
+        assert_eq!(entry.generated_samples, Some(4800));
+        assert_eq!(entry.confirmed_played_samples, Some(1200));
+        assert!(!entry.finished);
     }
 
     #[test]

@@ -1,0 +1,389 @@
+{
+  "schema": 1,
+  "full_goal_complete": false,
+  "status": "history_view_checkpoint",
+  "checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536",
+  "previous_checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-10-31/delayed-receipts-8819d34",
+  "superseded_prototype": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-ui-paused",
+  "scope": "Explicit read-only dialogue history in four native frontends: negotiated feature, scope-bound coordinator pages, host view cache, lock/observer withdrawal and cross-project isolation.",
+  "source_delta": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/source-delta.json",
+  "workspace_tests": {
+    "passed": 178,
+    "failed": 0,
+    "new": 19,
+    "new_by_crate": {
+      "companion_protocol": 4,
+      "jcompaniond": 6,
+      "companion_host": 9
+    },
+    "log": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/logs/workspace-tests.log"
+  },
+  "strict_workspace_clippy": true,
+  "rustfmt_check": true,
+  "ipc": {
+    "history_contracts": {
+      "tests": 5,
+      "passed": true,
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/logs/history_contracts.json"
+    },
+    "withdrawal_and_legacy_contracts": {
+      "tests": 21,
+      "passed": true,
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/logs/withdrawal_contracts.json",
+      "note": "CI script previously failed 4 tests: ModernPeer lacked the clocked attribute added for voice; harness fixed, no daemon change needed."
+    },
+    "fault_processes": {
+      "passed": true,
+      "log": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/logs/fault_processes.log"
+    }
+  },
+  "host_bundles": {
+    "vendored_and_checked": [
+      "forge",
+      "anvil",
+      "ember",
+      "frost"
+    ],
+    "voice_adapter_unchanged": true,
+    "log": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/logs/host-bundle-check.log"
+  },
+  "frontend_eva_tests": {
+    "forge": "13 passed, 4 ignored",
+    "anvil": "15 passed, 3 ignored",
+    "ember": "18 + 6 passed",
+    "frost": "19 passed"
+  },
+  "frontend_clippy": {
+    "new_warnings_in_changed_code": 0,
+    "preexisting": {
+      "forge": 3,
+      "anvil": 3,
+      "ember": 0,
+      "frost": "1 in close dialog"
+    }
+  },
+  "native_history_cases": {
+    "forge": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/native/forge/history-report.json",
+      "binary_sha256": {
+        "jcompaniond": "8a8153628dc5664a5e0fe16a90452c256f319a99b3b55162ba58443d04ded4d9",
+        "forge": "5e211506cfc83fd64a75278c124bafee3a7360fcb0d971590e308afe5e903757"
+      },
+      "turns_recorded": 9,
+      "stages": [
+        {
+          "label": "forge-1-before-load",
+          "note": "expanded; nothing requested yet",
+          "observer": null,
+          "capture_sha256": "cbeab4d5db83bdf1383f7a6c3c634d10256a21bb00c025de5509211962eba8aa"
+        },
+        {
+          "label": "forge-2-loaded-page1",
+          "note": "first page of 8 newest; Older enabled",
+          "observer": null,
+          "capture_sha256": "b7ecee85bcc6cf0bf8e893f8b29ebb77b2086adb54ca25181f26adc391d00277"
+        },
+        {
+          "label": "forge-3-older-page",
+          "note": "cursor page appends the oldest turn; Older disabled",
+          "observer": null,
+          "capture_sha256": "d7c81dd978c324a366e2e0cf5588c8afacaad7e884bf7c417a73968353feb84d"
+        },
+        {
+          "label": "forge-4-older-page-scrolled",
+          "note": "outer popover scrolled to show history area",
+          "observer": null,
+          "capture_sha256": "088f8624a82b499de27995b0e8d8dacd09763a3122c8d747b3c08289819b60e2"
+        },
+        {
+          "label": "forge-5-locked-withdrawn",
+          "note": "authorized desktop observer reports lock; page cleared by coordinator push",
+          "observer": "locked",
+          "capture_sha256": "ed9777f806083682975b05fd3daa2b087e0376e66795d9366a09fb1c2f12b202"
+        },
+        {
+          "label": "forge-6-locked-refused",
+          "note": "explicit request while locked is refused by the coordinator",
+          "observer": null,
+          "capture_sha256": "e16193a3a0b39f7c99def058d0029d8fce541e7f5a5728fed07e825f8bc1e419"
+        },
+        {
+          "label": "forge-7-unlocked-reloaded",
+          "note": "after unlock an explicit reload shows the page again",
+          "observer": null,
+          "capture_sha256": "5baa1c9d76a0a85178e9af233e782c1926334558552f25d462c8763406393d09"
+        },
+        {
+          "label": "forge-scope-menu",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "aff0ad9cd96657f37b852a18caede2c51d0f3d35e042444c1edba76e7a3920a7"
+        },
+        {
+          "label": "forge-8-project-scope-selected",
+          "note": "scope change clears the shown page",
+          "observer": null,
+          "capture_sha256": "bd6688e200e9eb73d800aef4a3952fa58ffc46128df7e109926937d935f68e3b"
+        },
+        {
+          "label": "forge-9-project-unavailable",
+          "note": "no project assigned to this pane: request not sent",
+          "observer": null,
+          "capture_sha256": "87d1d5d3d32c5fcb4d013eefb1e165b5eda2dd7aa950fd7d2ff1d4014c5a9b43"
+        },
+        {
+          "label": "forge-10-pane-reloaded",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "5baa1c9d76a0a85178e9af233e782c1926334558552f25d462c8763406393d09"
+        },
+        {
+          "label": "forge-11-observer-lost",
+          "note": "desktop observer disconnects: state unknown, page withdrawn",
+          "observer": "disconnected",
+          "capture_sha256": "79832c255d5f524e55bb0d1bbc107d458bb724463613cd56c6dca804a4785920"
+        }
+      ],
+      "manual_review": "Expanded panel issued no request and kept message-entry focus; Load showed 8 newest with Older enabled; Older showed all 9 and disabled Older; lock cleared the page with the withdrawal notice; Load while locked showed the coordinator refusal; unlock + Load restored the page; Current project scope cleared the page and explained the pane has no project; observer disconnect cleared the page again."
+    },
+    "anvil": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/native/anvil/history-report.json",
+      "binary_sha256": {
+        "jcompaniond": "8a8153628dc5664a5e0fe16a90452c256f319a99b3b55162ba58443d04ded4d9",
+        "anvil": "0c7fefc8312b0a0520eca2d28ddd43c0450a2fdf733fdd9b552b67dd7bf6865b"
+      },
+      "turns_recorded": 9,
+      "stages": [
+        {
+          "label": "anvil-0-card",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "0f355797370b0c563ac4b3a02c8da5946a8571003e31f9c71332f842daa8b7d3"
+        },
+        {
+          "label": "anvil-sent",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "3663e80f6b58c36f79c409d1c97b205360c022b55e38a9a8735affb7328aaa3f"
+        },
+        {
+          "label": "anvil-1-before-load",
+          "note": "expanded; nothing requested yet",
+          "observer": null,
+          "capture_sha256": "698271a82237345f162d08eb320ad6e30ab7e23c48194afc90dd41172f3640ab"
+        },
+        {
+          "label": "anvil-2-loaded-page1",
+          "note": "first page of 8 newest; Older enabled",
+          "observer": null,
+          "capture_sha256": "92fdd546b69c070fcafd0c3846b9554c1ea7985c5f8eb5978f27321ab4385274"
+        },
+        {
+          "label": "anvil-3-older-page",
+          "note": "cursor page appends the oldest turn",
+          "observer": null,
+          "capture_sha256": "2624ba185d896783bfa278b073697091493885462bca4a2f2f543b352352b3cc"
+        },
+        {
+          "label": "anvil-4-locked-withdrawn",
+          "note": "lock pushes withdrawal",
+          "observer": "locked",
+          "capture_sha256": "699d1c844031f2d24408124da801bbc3e629713c9df9bdf563ce7106ece6a15f"
+        },
+        {
+          "label": "anvil-5-locked-refused",
+          "note": "request while locked refused",
+          "observer": null,
+          "capture_sha256": "b36bfe50774b8176396c973369711b62b97e8b17f52bd94416a505d33e5509f8"
+        },
+        {
+          "label": "anvil-6-unlocked-reloaded",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "e390e626f6475769909840931fba666b3ade09b0f00ccc84e6026667488c1e0d"
+        },
+        {
+          "label": "anvil-7-observer-lost",
+          "note": "observer loss withdraws page",
+          "observer": "disconnected",
+          "capture_sha256": "ef3c949bdb4ee561448a8f2b9a1f2e34374f79cd29da16229e0d8cc9e6ce356b"
+        }
+      ],
+      "manual_review": "Same sequence as Forge except the project-scope step: 8 newest + Older, all 9, lock withdrawal, locked refusal, unlocked reload, observer-loss withdrawal."
+    },
+    "ember": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/native/ember/history-report.json",
+      "binary_sha256": {
+        "jcompaniond": "8a8153628dc5664a5e0fe16a90452c256f319a99b3b55162ba58443d04ded4d9",
+        "ember": "5cccd69ac31f1d5a13df6afc0f88d5099a933ec0be3190aa15a300dfb8845d82"
+      },
+      "turns_recorded": 9,
+      "stages": [
+        {
+          "label": "ember-0-card",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "d237912eebb965dae58ffb53a766dbd5b927d5f8f0718b51bf02e5c0092de968"
+        },
+        {
+          "label": "ember-card-scrolled",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "fe6c08ce3e3c2cad8ce4fc3ac4bcbfe65c3bc11b17035c40879409d9fda731e0"
+        },
+        {
+          "label": "ember-sent",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "ed98dad064a46b0786f52dd43dd55c8919406f7b58f2404ecc55397cff43f9b4"
+        },
+        {
+          "label": "ember-scrolled2",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "058d08538c69eca2047d6af8e8fd740d55428db906cee7b9c0b20f2c697c90f4"
+        },
+        {
+          "label": "ember-1-before-load",
+          "note": "expanded; nothing requested yet",
+          "observer": null,
+          "capture_sha256": "c9810e1c6e0fc1d9e11dcd5d14e46def17a205a26fa1d2faa55c70ca1376f247"
+        },
+        {
+          "label": "ember-2-loaded-page1",
+          "note": "first page; Older enabled",
+          "observer": null,
+          "capture_sha256": "8bea0316b0adc62c2fc93f2797efd2ca1b3043ec0ebb52fad05cad32278e5329"
+        },
+        {
+          "label": "ember-3-older-page",
+          "note": "cursor page appends the oldest turn",
+          "observer": null,
+          "capture_sha256": "134bba05d646f0637a4088f19512ba526bf91c5a028777ba13494b84c87b6b5c"
+        },
+        {
+          "label": "ember-4-locked-withdrawn",
+          "note": "lock pushes withdrawal",
+          "observer": "locked",
+          "capture_sha256": "9b88d7c5ad94af025713ba2b7f6cfbf9c8c366e2c99331d0748fe2edf4050eb4"
+        },
+        {
+          "label": "ember-5-locked-refused",
+          "note": "request while locked refused",
+          "observer": null,
+          "capture_sha256": "def248f5505390716e90cc01c534aadaac70176018e27e0bfd0df1ec1fc93d47"
+        },
+        {
+          "label": "ember-6-unlocked-reloaded",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "8bea0316b0adc62c2fc93f2797efd2ca1b3043ec0ebb52fad05cad32278e5329"
+        },
+        {
+          "label": "ember-7-observer-lost",
+          "note": "observer loss withdraws page",
+          "observer": "disconnected",
+          "capture_sha256": "c8d000e10b0a3043dbf5e58783b464dfcc88743d2e5f7bca549e72c25d3cb21a"
+        }
+      ],
+      "manual_review": "Same sequence in the egui card: 8 newest + Older, all 9, lock withdrawal, locked refusal, unlocked reload, observer-loss withdrawal."
+    },
+    "frost": {
+      "report": "/home/yj/projects/eva-companion-acceptance/2026-10-31/history-view-8a81536/native/frost/history-report.json",
+      "binary_sha256": {
+        "jcompaniond": "8a8153628dc5664a5e0fe16a90452c256f319a99b3b55162ba58443d04ded4d9",
+        "frost": "a16674cd1193e577488c3cd5806a8c07e94d8158a41569109fd73b4660c23417"
+      },
+      "turns_recorded": 9,
+      "stages": [
+        {
+          "label": "frost-sent",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "aa349dcc282347e13f0a97f8b4c2300d625ca92d073bb84fe27f5104fff47c09"
+        },
+        {
+          "label": "frost-settings",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "fa9024727a30dccc518cd382003585a24213b9a79b1b9d1f7a669bf2e40e5ef0"
+        },
+        {
+          "label": "frost-settings-scrolled",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "077f37f080d56f9b9b87642b2ea927cf2933245c14fd283c01322d9363fccee5"
+        },
+        {
+          "label": "frost-up1",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "78a50a6446716e95c5d398668553e25bae637d27f0b6452e074734c780b46c94"
+        },
+        {
+          "label": "frost-down1",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "4ca03bb41b05225a425dce3b1e9282beeb1fd4281de0268bc24909025ccf7e1c"
+        },
+        {
+          "label": "frost-down2",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "d0b5f2b25f0a621dc43b6c24275d0280bd7f86cdeb03abfcbaa9f912cb900a91"
+        },
+        {
+          "label": "frost-1-before-load",
+          "note": "settings section; nothing requested yet",
+          "observer": null,
+          "capture_sha256": "d0b5f2b25f0a621dc43b6c24275d0280bd7f86cdeb03abfcbaa9f912cb900a91"
+        },
+        {
+          "label": "frost-2-loaded-page1",
+          "note": "first page; Older enabled",
+          "observer": null,
+          "capture_sha256": "5f7830483c123e1d4da230fdfae2444650043aaaa520d7dc49d14da222812023"
+        },
+        {
+          "label": "frost-3-older-page",
+          "note": "cursor page appends the oldest turn",
+          "observer": null,
+          "capture_sha256": "c1d9881948b08e8150be8f9ffd4d00b4970dad53f0eea5257093b7f8e8370dd6"
+        },
+        {
+          "label": "frost-4-locked-withdrawn",
+          "note": "lock pushes withdrawal",
+          "observer": "locked",
+          "capture_sha256": "7ad5e872496ec8cd78b5a7ef2ac5f9a92108e4e464020b491937497ab7dfbace"
+        },
+        {
+          "label": "frost-5-locked-refused",
+          "note": "request while locked refused",
+          "observer": null,
+          "capture_sha256": "b1b128735e67b8ea7e22dcf92e45ded0a0e90d161a4a01fc3b28b265c481ca9e"
+        },
+        {
+          "label": "frost-6-unlocked-reloaded",
+          "note": null,
+          "observer": null,
+          "capture_sha256": "4acfa8fdc7ae13105163a9326a3729dcd0742a74adef26eaaa8f70369e5973a9"
+        },
+        {
+          "label": "frost-7-observer-lost",
+          "note": "observer loss withdraws page",
+          "observer": "disconnected",
+          "capture_sha256": "a968a7295c673484fc3aafd39fade98e82faf1af94bb4493329c48626e690176"
+        }
+      ],
+      "manual_review": "Same sequence in the iced settings panel; entries truthfully say not reported as shown because Frost reports display only after explicit acknowledgement."
+    }
+  },
+  "native_environment": "Private Xvfb 1600x1200, metacity xrender, private DBus/HOME/XDG/profile, Block mode, offline route, driver authorized as desktop observer via EVA_COMPANION_DESKTOP_EXE.",
+  "limitations": [
+    "Single window per frontend; no simultaneous multi-window viewing",
+    "Task scope and voice entries verified by unit/IPC tests, not native UI",
+    "No Wayland, IME, performance, physical audio, official API, installation or service change",
+    "Screenshots reviewed manually; no OCR assertions"
+  ],
+  "publication": "Pushed to master with this summary; commit IDs are in the local push receipt."
+}

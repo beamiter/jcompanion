@@ -83,6 +83,10 @@ pub struct Entry {
     pub user_input: Option<String>,
     #[serde(skip)]
     pub model_output: Option<String>,
+    /// Session-only: the turn carried reviewed terminal text. Its dialogue
+    /// text is then shown only to the exact original context.
+    #[serde(skip)]
+    pub reviewed_selection: bool,
 }
 impl Entry {
     fn new(origin: Origin, route: Route) -> Self {
@@ -100,6 +104,7 @@ impl Entry {
             publisher: None,
             user_input: None,
             model_output: None,
+            reviewed_selection: false,
         }
     }
 }
@@ -124,7 +129,172 @@ pub struct Ledger {
     journal_failed: bool,
     voice_events: Option<crate::dialogue_events::Journal>,
 }
+fn same_context(a: &ContextRef, b: &ContextRef) -> bool {
+    a.host_id == b.host_id
+        && a.pane_id == b.pane_id
+        && a.task_id == b.task_id
+        && a.project_id == b.project_id
+}
+fn in_scope(
+    origin: &Origin,
+    context: &ContextRef,
+    scope: companion_protocol::history::Scope,
+) -> bool {
+    use companion_protocol::history::Scope;
+    match (origin, scope) {
+        (Origin::Text(c), Scope::Context) => same_context(c, context),
+        (Origin::Text(c), Scope::Task) => {
+            context.task_id.is_some()
+                && c.task_id == context.task_id
+                && c.project_id == context.project_id
+        }
+        (Origin::Text(c), Scope::Project) => {
+            context.project_id.is_some() && c.project_id == context.project_id
+        }
+        (Origin::Voice { .. }, Scope::Voice) => true,
+        _ => false,
+    }
+}
+fn history_cursor(row: &crate::dialogue_store::Turn) -> String {
+    use sha2::{Digest, Sha256};
+    let identity = serde_json::to_vec(&(&row.boot_id, &row.turn_id, &row.entry.origin))
+        .expect("history identity is plain data");
+    Sha256::digest(identity)
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
+}
 impl Ledger {
+    /// One read-only page, newest first. The caller has already checked that
+    /// `context` is the requesting host's current context and the desktop is
+    /// unlocked. Dialogue text exists only for this coordinator session.
+    pub fn history(
+        &self,
+        context: &ContextRef,
+        scope: companion_protocol::history::Scope,
+        before: Option<&str>,
+    ) -> Result<(Vec<companion_protocol::history::Entry>, Option<String>), &'static str> {
+        use companion_protocol::history::{self as view, Text};
+        if !scope.available(context) {
+            return Err("scope_unavailable");
+        }
+        let journal = self
+            .journal
+            .as_ref()
+            .filter(|_| !self.journal_failed)
+            .ok_or("history_unavailable")?;
+        let rows: Vec<_> = journal
+            .turns()
+            .iter()
+            .rev()
+            .filter(|row| in_scope(&row.entry.origin, context, scope))
+            .collect();
+        let start = match before {
+            Some(before) => {
+                rows.iter()
+                    .position(|row| history_cursor(row) == before)
+                    .ok_or("history_cursor_stale")?
+                    + 1
+            }
+            None => 0,
+        };
+        let mut entries = Vec::new();
+        let mut bytes = 0;
+        for row in &rows[start..] {
+            let current = row.boot_id == journal.boot_id();
+            let key = match &row.entry.origin {
+                Origin::Text(_) => Key::Text(row.turn_id.clone()),
+                Origin::Voice { owner, .. } => Key::Voice {
+                    source: owner.source_id.clone(),
+                    turn: row.turn_id.clone(),
+                },
+            };
+            let live = current
+                .then(|| self.entries.get(&key))
+                .flatten()
+                .filter(|live| live.origin == row.entry.origin);
+            let entry = live.unwrap_or(&row.entry);
+            let (source, text, receipts) = match &entry.origin {
+                Origin::Text(origin) => {
+                    let text = match live {
+                        None if !current => Text::EarlierSession,
+                        None => Text::NotRecorded,
+                        Some(live) if live.reviewed_selection && !same_context(origin, context) => {
+                            Text::WithheldOutsideOrigin
+                        }
+                        Some(_) => Text::Shown,
+                    };
+                    (Some(origin.clone()), text, None)
+                }
+                Origin::Voice { owner, .. } => (
+                    None,
+                    Text::NotRecorded,
+                    self.voice_events.as_ref().and_then(|events| {
+                        events.receipts(
+                            &row.boot_id,
+                            &owner.source_id,
+                            &owner.session_id,
+                            &row.turn_id,
+                        )
+                    }),
+                ),
+            };
+            let shown = text == Text::Shown;
+            let mut page = view::Entry {
+                cursor: history_cursor(row),
+                turn_id: row.turn_id.clone(),
+                created_at_ms: row.created_at_ms,
+                route: match entry.route {
+                    Route::TextResponses => view::Route::Text,
+                    Route::Offline => view::Route::Offline,
+                    Route::EvaVoice => view::Route::Voice,
+                },
+                source,
+                text,
+                input: shown.then(|| entry.user_input.clone()).flatten(),
+                reply: shown.then(|| entry.model_output.clone()).flatten(),
+                generated: entry.generated,
+                displayed: entry.displayed,
+                interrupted: entry.interrupted,
+                finished: entry.finished,
+                end: entry.end.map(|end| match end {
+                    End::ResponseComplete => view::End::ResponseComplete,
+                    End::Interrupted => view::End::Interrupted,
+                    End::NextVoiceTurn => view::End::NextVoiceTurn,
+                    End::AudioStopped => view::End::AudioStopped,
+                    End::Error => view::End::Error,
+                    End::ObservationLost => view::End::ObservationLost,
+                    End::ResourcesReleased => view::End::ResourcesReleased,
+                    End::RestartedUnknown => view::End::RestartedUnknown,
+                }),
+                recovered_after_restart: row.recovered_after_restart,
+                generated_samples: entry.audio.as_ref().map(|a| a.generated_samples),
+                confirmed_played_samples: entry.audio.as_ref().map(|a| a.confirmed_played_samples),
+                receipts,
+            };
+            let mut size = serde_json::to_vec(&page)
+                .map_err(|_| "history_unavailable")?
+                .len();
+            if size > view::MAX_PAGE_BYTES {
+                page.text = Text::TooLarge;
+                page.input = None;
+                page.reply = None;
+                size = serde_json::to_vec(&page)
+                    .map_err(|_| "history_unavailable")?
+                    .len();
+            }
+            if entries.len() == view::MAX_PAGE || bytes + size > view::MAX_PAGE_BYTES {
+                break;
+            }
+            debug_assert!(page.valid());
+            bytes += size;
+            entries.push(page);
+        }
+        let next = (start + entries.len() < rows.len())
+            .then(|| entries.last().map(|e| e.cursor.clone()))
+            .flatten();
+        Ok((entries, next))
+    }
     pub fn open(dir: &std::path::Path, companion: &str, boot: &str) -> std::io::Result<Self> {
         Ok(Self {
             journal: Some(Journal::open(dir, companion, boot)?),
@@ -256,7 +426,13 @@ impl Ledger {
             route,
             Some(turn.text.clone()),
             publisher,
-        )
+        )?;
+        if turn.approved_selection.is_some() {
+            if let Some(entry) = self.entries.get_mut(&Key::Text(turn.turn_id.clone())) {
+                entry.reviewed_selection = true;
+            }
+        }
+        Ok(())
     }
     fn begin_text(
         &mut self,

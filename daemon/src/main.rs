@@ -43,6 +43,8 @@ struct Peer {
     eva: Option<String>,
     voice_clocked_since: Option<u64>,
     voice_dialogue: bool,
+    /// Negotiated `DialogueHistoryV1`; only such hosts receive history replies.
+    history: bool,
     io: Framed,
     host: Option<Host>,
     seq: u64,
@@ -235,7 +237,19 @@ fn run() -> io::Result<()> {
         });
     let mut history_failure_reported = provider.ledger.journal_failed();
     let mut turn_owners = HashMap::<String, (u64, ContextRef)>::new();
+    let mut history_withheld = false;
     loop {
+        // Every path that locks the desktop or loses its observer converges
+        // here; negotiated hosts clear any history page they show.
+        let withheld = state.locked || (state.desktop_observed && !state.desktop_known);
+        if withheld && !history_withheld {
+            for p in peers.values_mut().filter(|p| p.history) {
+                p.queue(&Reply::DialogueHistoryWithdrawn {
+                    reason: "desktop_locked_or_unknown".into(),
+                })?;
+            }
+        }
+        history_withheld = withheld;
         loop {
             match listener.accept() {
                 Ok((s, _)) => {
@@ -266,6 +280,7 @@ fn run() -> io::Result<()> {
                             eva: None,
                             voice_clocked_since: None,
                             voice_dialogue: false,
+                            history: false,
                             io: Framed::new(s)?,
                             host: None,
                             seq: 0,
@@ -415,7 +430,6 @@ fn run() -> io::Result<()> {
                     | Request::HelloWithFeatures { host, .. } = e.body.clone()
                     {
                         let compositor = matches!(e.body, Request::CompositorHello { .. });
-                        let modern = matches!(e.body, Request::HelloWithFeatures { .. });
                         if p.host.is_some()
                             || p.eva.is_some()
                             || p.desktop.is_some()
@@ -438,14 +452,17 @@ fn run() -> io::Result<()> {
                             p.events.insert(e.event_id);
                             p.host = Some(host.clone());
                             p.compositor = compositor;
-                            if modern {
+                            if let Request::HelloWithFeatures { features, .. } = &e.body {
+                                // decode() admits only supported ordered sets;
+                                // accept exactly what this host requested.
+                                p.history = features.contains(&HostFeature::DialogueHistoryV1);
                                 let nonce = random_id()?;
                                 p.admission.negotiate(nonce.clone());
                                 p.queue(&Reply::HostAccepted {
                                     boot_id: state.boot_id.clone(),
                                     companion_id: state.companion_id.clone(),
                                     session_id: session.clone(),
-                                    features: vec![HostFeature::WithdrawalResumeV1],
+                                    features: features.clone(),
                                     connection_nonce: nonce,
                                 })?;
                             } else {
@@ -961,6 +978,54 @@ fn run() -> io::Result<()> {
                                         status: error,
                                     });
                                 p.queue(&reply)?;
+                                None
+                            }
+                            Request::DialogueHistory {
+                                request_id,
+                                context,
+                                scope,
+                                before,
+                            } => {
+                                let page = if !p.history {
+                                    Err("history_not_negotiated")
+                                } else if p.context.as_ref() != Some(&context) {
+                                    Err("stale_context")
+                                } else if unix_millis() == 0
+                                    || state.locked
+                                    || (state.desktop_observed && !state.desktop_known)
+                                {
+                                    Err("desktop_locked_or_unknown")
+                                } else if matches!(
+                                    scope,
+                                    history::Scope::Task | history::Scope::Project
+                                ) && context.task_id.as_ref().is_some_and(|task| {
+                                    task_authority
+                                        .bind(&h, task, context.project_id.as_deref())
+                                        .is_err()
+                                }) {
+                                    Err("scope_unavailable")
+                                } else {
+                                    provider.ledger.history(&context, scope, before.as_deref())
+                                };
+                                let (status, entries, next_before) = match page {
+                                    Ok((entries, next)) => ("ok", entries, next),
+                                    Err(status) => (status, vec![], None),
+                                };
+                                if p.history {
+                                    p.queue(&Reply::DialogueHistory {
+                                        request_id,
+                                        context,
+                                        scope,
+                                        status: status.into(),
+                                        entries,
+                                        next_before,
+                                    })?;
+                                } else {
+                                    p.queue(&Reply::OperationError {
+                                        operation: "dialogue_history".into(),
+                                        reason: status.into(),
+                                    })?;
+                                }
                                 None
                             }
                             Request::DialogueStart {

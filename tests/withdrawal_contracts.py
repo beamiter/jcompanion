@@ -22,7 +22,7 @@ OBSERVATIONS=[]
 class ModernPeer(legacy.Peer):
     def __init__(self,path,name):
         self.socket=socket.socket(socket.AF_UNIX);self.socket.settimeout(3);self.socket.connect(str(path))
-        self.name,self.boot,self.seq=name,'',0;self.pending=deque();self.epoch=0;self.geometry_revision=0
+        self.name,self.boot,self.seq=name,'',0;self.pending=deque();self.epoch=0;self.geometry_revision=0;self.clocked=False
         try:
             self.send(dict(type='hello_with_features',host=dict(id=name,incarnation=1,surface_id='test-surface',retirement='native_presented'),features=['withdrawal_resume_v1']))
             deadline=time.monotonic()+3
