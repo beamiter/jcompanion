@@ -1,4 +1,4 @@
-# Opt-in deployment and diagnostics
+# Deployment and diagnostics
 
 This is source-preview integration, not hardware acceptance. Protocol version: **1**.
 All hosts and the daemon must use a compatible release snapshot. Do not combine
@@ -22,14 +22,24 @@ chmod 700 "$HOME/.local/state/jcompanion-eva"
 "$HOME/.local/bin/jcompaniond" "$HOME/.local/state/jcompanion-eva"
 ```
 
-This does not install/enable a service, modify terminal settings, or configure a
-provider. Keep existing settings and private profile data when upgrading. For
+The manual commands above do not install/enable a service or configure a provider.
+JWM startup uses a private profile and coordinator log in the XDG state directory,
+passes only session variables and the trusted desktop executable, and does not
+import model credentials. Existing served sockets are reused across JWM restarts.
+An explicit `EVA_COMPANION_SOCKET` stays externally managed; SSH sessions never
+auto-start the coordinator. Startup preserves authority journals, including
+session mismatch and recovery blocks; it never resets a journal to force startup. Keep existing settings and private profile data when upgrading. For
 custom XDG state paths pass the actual private profile explicitly. Provider
 configuration is described in [companion-openai](../crates/companion-openai/README.md).
 No key belongs in version control, frontend config, diagnostics or command arguments.
 
-Launch upgraded frontends from the same graphical session with
-`EVA_COMPANION_MODE=shared`. The default socket is
+Current Anvil, Forge, Ember and Frost enable Shared Eva by default. JWM starts or reuses
+`jcompaniond` when its graphical-session loop starts; terminals only connect. Install
+the coordinator beside JWM, in `~/.local/bin`, or on `PATH` (the JWM installer now
+installs a pinned coordinator by default). Set `[behavior] eva_companion_enabled = false`
+in JWM to disable automatic startup and set the root `eva_companion_enabled = false`
+in any frontend to disable Shared Eva there. Both settings take effect on restart.
+`EVA_COMPANION_MODE=shared` remains an explicit frontend override. The default socket is
 `$XDG_RUNTIME_DIR/jcompanion/eva.sock`; a custom `EVA_COMPANION_SOCKET` must match
 in daemon and all clients and have an owned, private parent. The daemon refuses
 cross-session peers. Existing JWM Eva voice installation is separate; this daemon
@@ -72,3 +82,5 @@ Known limits: real multiwindow IPC faults, GPU/scanout, IME, monitor transitions
 physical audio and live provider behavior remain unverified. Native submission is
 not proof of physical scanout removal. General recovery from permanently lost
 ownership evidence is intentionally fail-closed, not a completed recovery UI.
+
+Native lifecycle limit (2026-11-01): an additional real X11 WM-restart probe reused the same coordinator PID and reconnected the observer, but the Anvil body stayed awaiting removal proof. Body resumption across WM restart is not accepted by the default-startup checkpoint; the failed raw report is preserved.

@@ -1,6 +1,6 @@
 # Eva Companion coordinator
 
-Local Rust coordination foundation for one Eva across GUI hosts. **Opt-in**. Default offline mode opens no network or audio. Optional explicitly configured Responses requests run in a bounded worker; GUI/renderer processes receive no provider credentials. No arbitrary shell executor exists. Source: https://github.com/beamiter/jcompanion. See [deployment](docs/deployment.md) for opt-in installation and diagnostics.
+Local Rust coordination foundation for one Eva across GUI hosts. **Enabled by default in the four terminals; started by JWM**. Default offline mode opens no network or audio. Optional explicitly configured Responses requests run in a bounded worker; GUI/renderer processes receive no provider credentials. No arbitrary shell executor exists. Source: https://github.com/beamiter/jcompanion. See [deployment](docs/deployment.md) for installation and diagnostics.
 
 **Before enabling shared mode:** close/disable legacy independent pets and upgrade all open terminal instances. This protocol cannot remotely silence an older pet that never registered. Keep the existing local-only fallback explicitly OFF in shared mode.
 

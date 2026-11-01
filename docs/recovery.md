@@ -6,4 +6,4 @@ A crash after grant persistence but before actual delivery can conservatively le
 
 Recovery remains blocked if the host instance is gone and no trusted compositor surface-destruction proof integration exists. This is intentional and is not an implemented general recovery UI. Close/upgrade legacy independent pets before enabling shared mode; an old client that never spoke this protocol cannot be remotely disabled by it.
 
-Release defaults stay disabled via explicit launch/environment opt-in. No auto-start service or OS policy changes are installed. Compositor-only and compositor-proof requirements are persisted and never silently downgraded by omitted environment flags.
+Current frontend defaults enable Shared Eva and JWM starts/reuses the coordinator for its graphical session. Explicit configuration can disable either default. No login-wide systemd service or OS policy changes are installed. Compositor-only and compositor-proof requirements are persisted and never silently downgraded by omitted environment flags.

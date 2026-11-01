@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "status": "default_eva_and_jwm_startup_checkpoint",
+  "full_goal_complete": false,
+  "scope": "Four frontend defaults enabled, explicit disables retained; JWM starts/reuses one same-session coordinator and connects its desktop observer and default X11 frame feedback. Terminals do not start it.",
+  "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm",
+  "frontend_installation": [
+    {
+      "app": "anvil",
+      "config": "/home/yj/.config/anvil/config.toml",
+      "shared_eva": true,
+      "legacy_organism": false,
+      "binary_sha256": "882db21c5974dce89f085dd3b2ae131eb2e2ea27bfa354b1bb2402d0c8aa4e4c",
+      "backup": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm/anvil-binary-before"
+    },
+    {
+      "app": "forge",
+      "config": "/home/yj/.config/forge/config.toml",
+      "shared_eva": true,
+      "legacy_organism": false,
+      "binary_sha256": "afcf7822b2be7431a3960d6a02a418b2be8ba98e99806614c75fc2028382dbe8",
+      "backup": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm/forge-binary-before"
+    },
+    {
+      "app": "ember",
+      "config": "/home/yj/.config/ember/config.toml",
+      "shared_eva": true,
+      "legacy_organism": false,
+      "binary_sha256": "6012937a6b688bdc2ad58dfd05dbcfee2905037ba28a93c5cbaa60b58c3a80ef",
+      "backup": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm/ember-binary-before"
+    },
+    {
+      "app": "frost",
+      "config": "/home/yj/.config/frost/config.toml",
+      "shared_eva": true,
+      "legacy_organism": false,
+      "binary_sha256": "23641e5ff5acf2925e7eb60b42e9d3d38409121110b14edfd82a93b757461b00",
+      "backup": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm/frost-binary-before"
+    }
+  ],
+  "native_default_startup": {
+    "passed": true,
+    "shared_mode_env_override": false,
+    "frontend_enable_config_override": false,
+    "manual_coordinator_launch": false,
+    "manual_frame_sync_env": false,
+    "jwm_started_coordinator_pids": [
+      201027
+    ],
+    "observer_connected": true,
+    "settled_stops": 7,
+    "samples": 24,
+    "max_detected_body_windows": 1,
+    "companion_id": "b169735c2359547f280ba16d85a8316c",
+    "report": "/home/yj/projects/eva-companion-acceptance/2026-11-01/default-eva-jwm/runs/default-startup-release/default-startup-report.json",
+    "binary_sha256": {
+      "jcompaniond": "822d272606695b1a945002fe37b183f4b33cc1b091038b2cc5402161e6c1300a",
+      "anvil": "882db21c5974dce89f085dd3b2ae131eb2e2ea27bfa354b1bb2402d0c8aa4e4c",
+      "forge": "afcf7822b2be7431a3960d6a02a418b2be8ba98e99806614c75fc2028382dbe8",
+      "ember": "6012937a6b688bdc2ad58dfd05dbcfee2905037ba28a93c5cbaa60b58c3a80ef",
+      "frost": "23641e5ff5acf2925e7eb60b42e9d3d38409121110b14edfd82a93b757461b00",
+      "jwm": "fec584018efdfbb9779802633a9cd5e547c61be6e6bdde38c135033a50178c09",
+      "jsh": "8bbe9cb9ab0bb8e192beaca4b03974626aeca30cc5185e056da5098730450f46"
+    }
+  },
+  "validation": {
+    "frontend_rust_tests_passed": 16,
+    "jwm_rust_tests_passed": 9,
+    "python_classifier_tests_passed": 5,
+    "format_and_diff_checks": true,
+    "installer_shell_syntax": true,
+    "offline_jwm_installer_build_regression": "passed (scripts/test-install-jwm-build.sh)"
+  },
+  "source": {
+    "anvil": {
+      "head_at_validation": "7f40d5697ae4dfc5a5e7f5e709691ab484701d1c"
+    },
+    "forge": {
+      "head_at_validation": "4d62806a50cd92ef8878d3825b90384eaad15390"
+    },
+    "ember": {
+      "head_at_validation": "04f4122159563d0c59ea087e2eb6d364b99017c4"
+    },
+    "frost": {
+      "head_at_validation": "73f7c97b98a1b5e190c4221b80d7c88ad9d6d41c"
+    },
+    "jwm": {
+      "head_at_validation": "45d4209715af3011deb08f28a16d6c4139af86eb"
+    },
+    "jcompanion": {
+      "head_at_validation": "ff38a6479c7b2d8e809a961ab72d4e79073576cf"
+    }
+  },
+  "jwm_startup_source_sha256": "9caa9864f17d9a1233a4ccb43d728fc53b30a6c737f23624e9ffd5093baf1d7b",
+  "limits": [
+    "This is isolated X11/Xvfb/JWM GLX, not physical monitor/Wayland/IME/audio/model/performance acceptance.",
+    "Extra WM-restart probe kept the same coordinator PID and reconnected the observer, but body resumption failed awaiting removal proof; its raw failed report is preserved.",
+    "Cross-session migration and uncertain-authority recovery remain fail-closed; startup never resets a journal.",
+    "The system JWM binary has not been replaced: /usr/local/bin/jwm is root-owned and sudo currently requires a password. The four frontend binaries/configs are installed; the current session coordinator remains running."
+  ],
+  "published_source_commits": {
+    "anvil": "b3bf770993bbc37ef8708f119229f52734ce3784",
+    "forge": "00eb1baa8de44e4d7c353954d645d31ddb8f4156",
+    "ember": "06ddf615f6da0fa057ec3e46d4d82c7cef976ba6",
+    "frost": "d6b876b22da9846d91dae77264153f96a158b1bb",
+    "jwm": "ca1d9e8d1ead009d834f536b26492f24f93db9c8"
+  }
+}
