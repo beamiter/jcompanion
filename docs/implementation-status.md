@@ -1016,6 +1016,29 @@ Xvfb/JWM（或 Metacity）。记录授权前画面、逐窗口身体像素、驻
 报告保留全部样本记录/校验和，代表性 PNG 的保留情况由 screenshot_retained 标明。
 Forge 冻结时可能被 WM 重排/裁出画面，保留 token 不代表其每个样本都仍然可见。
 
+## 四终端视觉验收（2026-11-01）
+
+共享 Eva 已启用的 Anvil / Forge / Ember / Frost 原生 Block、Chat 页面完成本轮视觉验收。
+覆盖 1356×704、760×640、1672×941，以及 GTK 2×、Ember/Frost 1.5×，共 12 个场景。
+修复 GTK 入口重叠、身体侵入右侧面板、浅色 Chat 对比度；Ember 详情裁切和快捷键向
+PTY 泄漏字母；Frost 详情常驻占位与默认按钮配色。空间不足时保留 Compact/隐藏退路。
+
+[已提交的验收摘要](evidence/four-native-visual-checks-2026-11-01.json) 记录四端提交、
+二进制哈希、12 个原生场景、测试结果及验收边界。
+完整 HTML 报告、八页截图总览、原图和哈希清单遵循 evidence 目录约定保留在本地
+`docs/evidence/four-native-visual-2026-11-01/`，未随源码发布。
+完整原始尝试、命令流、日志和失败校准记录保存在工作区
+`eva-companion-acceptance/2026-11-01/four-native-visual/`。
+最终 release 的 Anvil→Forge→Ember→Frost→Ember→Forge→Anvil 七站交接保持同一身份，
+26 次截图采样最多检出一个身体窗口。相关 Rust 测试 38 项、GTK 原生 widget 两项、
+分类器五项通过。四端本地二进制已更新为验收版本，回退位置见报告的 installation.json；
+日常共享模式仍按设计保持 opt-in。
+
+结论限于隔离 Xvfb/JWM GLX 的 X11 视觉范围。截图与 journal 不是原子/连续扫描证明；
+没有据此提升 Wayland、物理 IME、音频、模型、性能或 C01–C12 整体验收状态。
+Frost 拖选/复制探针未证明复制成功，不计入完整选择回归通过。部分 Ember 控制器未写出
+结束报告，其原始事件、截图和 PTY 哨兵仍保留，并明确标为从事件整理的证据。
+
 ## 完整范围核对
 
 “实现存在”与“已验收”分开列出；未验证项目保持未完成。

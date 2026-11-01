@@ -37,7 +37,8 @@ def cat_ink(color):
     # Outline/Accent have (G-B)/(G-R) >= .2; authored Dim effects are near .1.
     # An AA/opacity margin at .15 prevents a detached cloud being another body.
     return (r >= 60 and g >= 110 and b >= 100 and g - r >= 20 and g - b >= 4
-            and 20 * (g - b) >= 3 * (g - r))
+            and 20 * (g - b) >= 3 * (g - r)
+            and 2 * (g - b) <= g - r)
 
 
 def cat_components(area):
@@ -60,6 +61,12 @@ def cat_components(area):
         [max(0, (3*v+19)//20-1) for v in range(256)])
     body_hue = ImageChops.subtract(ImageChops.subtract(green, blue), required_minus_one)
     mask = ImageChops.multiply(mask, body_hue.point([0]+[255]*255))
+    # The native Frost Live badge is green (74,222,128), with 37 matching
+    # pixels under the old lower-bound-only test. Keep mint outline ink while
+    # rejecting that real, body-free chrome; no size/join threshold changes.
+    allowed = ImageChops.subtract(green, red).point([v // 2 + 1 for v in range(256)])
+    mint = ImageChops.subtract(allowed, ImageChops.subtract(green, blue))
+    mask = ImageChops.multiply(mask, mint.point([0]+[255]*255))
     width, height = area.size
     cols, rows = (width + 5) // 6, (height + 5) // 6
     coarse = mask.resize((cols, rows), Image.Resampling.BOX)

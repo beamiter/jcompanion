@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "date": "2026-11-01",
+  "full_goal_complete": false,
+  "status": "four_native_visual_checkpoint",
+  "scope": "Four native Linux X11 frontends, shared Eva enabled in isolated configs: Block/Chat, restrained native controls, safe placement and responsive sizing; sampled real seven-stop handoff.",
+  "result": "PASS for this visual scope only",
+  "checkpoint": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual",
+  "frontend_commits": {
+    "anvil": "7f40d5697ae4dfc5a5e7f5e709691ab484701d1c",
+    "forge": "4d62806a50cd92ef8878d3825b90384eaad15390",
+    "ember": "04f4122159563d0c59ea087e2eb6d364b99017c4",
+    "frost": "73f7c97b98a1b5e190c4221b80d7c88ad9d6d41c"
+  },
+  "source_at_capture": {
+    "anvil": {
+      "head": "b1339f96e2b0377126e4a261a4447589ee8b43dd",
+      "patch_sha256": "7e13f7700860ede5aa9363f55bab0414cf239f21fac2783198a30083ed21ee5e"
+    },
+    "forge": {
+      "head": "2a53674fd5f16036c2c85117345ee0f45d9b3d8e",
+      "patch_sha256": "281e9a5d13a1367c63ba60ebd2f995741b31a73140348b143ab6a12be9b5d0a0"
+    },
+    "ember": {
+      "head": "b3b2cae5a634b5e13179687116ebce5db1e50692",
+      "patch_sha256": "2460e8b6089039b73a39de6d2eb599f7e8d2fd4867ad5ac6414e427197a47ffe"
+    },
+    "frost": {
+      "head": "4f48f23fe5e09d9685682f58c00e9f217dcfc2d5",
+      "patch_sha256": "1f08c6bf3e17a4f669113f60032e6e4c259da061634842491e49b99331f2137c"
+    },
+    "jcompanion": {
+      "head": "9bc5e3f9a4ce04b760883ca2ac5c18351481006d",
+      "patch_sha256": "8badba501b5ebd7eb197607ce005d83216a487387c4d8b905c2c3d52bd85c4b2",
+      "added_files": {
+        "tests/native_visual.py": "9207976a796b1a890ebdf5eda1b93063d99ef43a2e87dd2deb80d38d2f7662d4",
+        "tests/native_visual_handoff.py": "e9e0d556ac12b44e417a8d2c7fffb9bc689bf62126abfff8f7967f8928aeb744",
+        "tests/fixtures/native-frost-live-dot.png": "c4bc85123c004599ea827fbdacc638bbc44a047cdf9465d5ba0cb3f3d8e76abe"
+      }
+    },
+    "jterm_core": {
+      "head": "974ccad203375032fe87706caecab39ad516c238",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "jwm": {
+      "head": "4e36ab3ca18263b63c57d5a903a47f55be159dfd",
+      "patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "binary_sha256": {
+    "anvil": "ff16ab68c8687caa061fd873b3ebb25c326bedd2e5dceb832987f96d7063bd4b",
+    "forge": "a0182deb64d7a00d783c63487251b7d17dba306843c222bd092551e61bb33d7b",
+    "ember": "fca2db600ac32c072b1ba2d27ac6879d0e338ca93fa53fe51ff0e2885fda15d5",
+    "frost": "baa709a2f2cf52c4edbb81cd8e44377d60096a1c2f0e4893fe4fe97c229533ba",
+    "jcompanion": "822d272606695b1a945002fe37b183f4b33cc1b091038b2cc5402161e6c1300a"
+  },
+  "native_cases": [
+    {
+      "name": "anvil-final-block",
+      "app": "anvil",
+      "mode": "block",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/anvil-final-block",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "anvil-final-chat",
+      "app": "anvil",
+      "mode": "chat",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/anvil-final-chat",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "anvil-final-hidpi",
+      "app": "anvil",
+      "mode": "chat",
+      "scale": 2,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/anvil-final-hidpi",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "forge-final-block",
+      "app": "forge",
+      "mode": "block",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/forge-final-block",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "forge-final-chat",
+      "app": "forge",
+      "mode": "chat",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/forge-final-chat",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "forge-release-hidpi",
+      "app": "forge",
+      "mode": "chat",
+      "scale": 2,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/forge-release-hidpi",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "ember-final-block",
+      "app": "ember",
+      "mode": "block",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/ember-final-block",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\nONCE\n"
+    },
+    {
+      "name": "ember-final-chat",
+      "app": "ember",
+      "mode": "chat",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/ember-final-chat",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": false,
+      "pty_once": "ONCE\nONCE\n"
+    },
+    {
+      "name": "ember-final-hidpi",
+      "app": "ember",
+      "mode": "block",
+      "scale": 1.5,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/ember-final-hidpi",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": false,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "frost-block",
+      "app": "frost",
+      "mode": "block",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/frost-block",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "frost-chat",
+      "app": "frost",
+      "mode": "chat",
+      "scale": 1,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/frost-chat",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    },
+    {
+      "name": "frost-hidpi",
+      "app": "frost",
+      "mode": "block",
+      "scale": 1.5,
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/frost-hidpi",
+      "visual_review": "pass (manual native screenshot review)",
+      "controller_report": true,
+      "pty_once": "ONCE\n"
+    }
+  ],
+  "handoff": {
+    "report": "runs/handoff-release/visual-handoff-report.json",
+    "companion_id": "cc22b07e2d49d10cbfc92c3da9f9816d",
+    "settled_stops": 7,
+    "sample_count": 26,
+    "max_detected_body_windows": 1,
+    "settled_sequence": [
+      {
+        "label": "settled-anvil",
+        "visible_body_windows": [
+          "anvil"
+        ],
+        "epoch": 1,
+        "screenshot": "005-settled-anvil.png"
+      },
+      {
+        "label": "settled-forge",
+        "visible_body_windows": [
+          "forge"
+        ],
+        "epoch": 2,
+        "screenshot": "009-settled-forge.png"
+      },
+      {
+        "label": "settled-ember",
+        "visible_body_windows": [
+          "ember"
+        ],
+        "epoch": 3,
+        "screenshot": "012-settled-ember.png"
+      },
+      {
+        "label": "settled-frost",
+        "visible_body_windows": [
+          "frost"
+        ],
+        "epoch": 4,
+        "screenshot": "016-settled-frost.png"
+      },
+      {
+        "label": "returned-ember",
+        "visible_body_windows": [
+          "ember"
+        ],
+        "epoch": 5,
+        "screenshot": "019-returned-ember.png"
+      },
+      {
+        "label": "returned-forge",
+        "visible_body_windows": [
+          "forge"
+        ],
+        "epoch": 6,
+        "screenshot": "022-returned-forge.png"
+      },
+      {
+        "label": "returned-anvil",
+        "visible_body_windows": [
+          "anvil"
+        ],
+        "epoch": 7,
+        "screenshot": "025-returned-anvil.png"
+      }
+    ]
+  },
+  "validation": {
+    "relevant_rust_tests_passed": 38,
+    "explicit_native_gtk_widget_tests_passed": 2,
+    "python_body_classifier_tests_passed": 5,
+    "release_builds": [
+      "anvil",
+      "forge",
+      "ember",
+      "frost"
+    ],
+    "build_flags": [
+      "--release",
+      "--locked",
+      "--offline"
+    ],
+    "format_and_diff_checks": true,
+    "logs": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/validation",
+    "note": "The ordinary GTK test invocations each left two native/lifecycle fixtures ignored; one widget fixture per frontend was then run explicitly under Xvfb. The remaining lifecycle fixtures are not counted as passed."
+  },
+  "native_layouts": {
+    "standard": [
+      1356,
+      704
+    ],
+    "compact": [
+      760,
+      640
+    ],
+    "wide": [
+      1672,
+      941
+    ],
+    "scaled_capture": [
+      2100,
+      1500
+    ],
+    "gtk_scale": 2,
+    "ember_frost_scale": 1.5
+  },
+  "preserved_failures": [
+    {
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/handoff-raw-shell-attempt",
+      "reason": "Plain /bin/sh did not supply a proven empty Block surface. The harness switched to the actual reporting jsh shell."
+    },
+    {
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/handoff-live-dot-false-positive",
+      "reason": "Frost Live chrome was misclassified as body ink. Added a real body-free native badge fixture and an upper mint hue bound; no pixel, component or spatial merge threshold was lowered."
+    },
+    {
+      "archive": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/runs/forge-final-hidpi",
+      "reason": "Typed command lost its prefix; the absent ONCE sentinel excluded this attempt. A slower, focused native run passed separately as forge-release-hidpi."
+    }
+  ],
+  "artifacts": {
+    "html_report": "/home/yj/projects/jcompanion/docs/evidence/four-native-visual-2026-11-01/report.html",
+    "raw_report": "/home/yj/projects/eva-companion-acceptance/2026-11-01/four-native-visual/report.json",
+    "raw_report_sha256": "786d6b6dc948cd4e295dfff5e981c08efbc3e61f9a407b933d2ad4e6ebb613ee",
+    "selected_capture_manifest": "/home/yj/projects/jcompanion/docs/evidence/four-native-visual-2026-11-01/selected-captures.json",
+    "artifact_hashes": "/home/yj/projects/jcompanion/docs/evidence/four-native-visual-2026-11-01/artifact-sha256.json",
+    "publication": "Compact evidence summary only. Full native captures, local installation receipts and reconstruction snapshots remain local, per docs/evidence/README.md."
+  },
+  "limits": [
+    "Xvfb/JWM GLX software-rendered X11; not physical monitor or Wayland acceptance.",
+    "Native captures plus journal are samples, not continuous scanout or latency measurements.",
+    "Default Cat in native visual cases; no blanket acceptance of every skin, motion or accessibility combination.",
+    "Synthetic CJK output is display evidence, not physical IME validation.",
+    "Frost drag/copy probe did not prove selection/copy; no full selection regression pass is claimed.",
+    "No real provider, audio device, API usage, sleep/resume or performance acceptance.",
+    "Shared mode remains opt-in in daily configs. No live user window was restarted.",
+    "Ember Chat and HiDPI controller shutdown did not emit final reports; their raw screenshot/event/hash/sentinel evidence is retained and explicitly summarized."
+  ]
+}

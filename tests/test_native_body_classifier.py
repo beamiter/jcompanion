@@ -3,11 +3,15 @@
 from pathlib import Path
 import unittest
 from PIL import Image
-from native_windows import cat_components
+from native_windows import cat_components, cat_ink
 
 FIXTURE=Path(__file__).with_name('fixtures')/'native-cat-guard-failure.png'
 
 class NativeBodyClassifier(unittest.TestCase):
+    def test_actual_frost_live_badge_is_not_a_companion(self):
+        with Image.open(FIXTURE.with_name('native-frost-live-dot.png')) as image:
+            self.assertEqual(sum(cat_ink(c) for c in image.convert('RGB').getdata()), 0)
+
     def test_one_native_cat_with_detached_dim_cloud_is_one_body(self):
         with Image.open(FIXTURE) as image:
             self.assertEqual(len(cat_components(image)),1)
